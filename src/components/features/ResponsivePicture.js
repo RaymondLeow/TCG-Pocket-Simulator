@@ -57,7 +57,10 @@ export default function ResponsivePicture() {
   const filter = useMotionTemplate`drop-shadow(${shadowX}px ${shadowY}px 20px rgba(0, 0, 68, 0.1))`;
 
   /* Convert cursor position values */
-  const convertCursorPosition = (e, frame) => {
+  const convertCursorPosition = (e) => {
+    // Ensure frame is available before accessing
+    if (!frame) return;
+
     const objectX = (e.nativeEvent.clientX - frame.left) / frame.width;
     const objectY = (e.nativeEvent.clientY - frame.top) / frame.height;
 
@@ -81,7 +84,7 @@ export default function ResponsivePicture() {
       left: currentElement.left,
     });
 
-    convertCursorPosition(e, currentElement);
+    convertCursorPosition(e);
   };
 
   /* On Mouse Move, convert values */
@@ -101,6 +104,14 @@ export default function ResponsivePicture() {
 
   /* Handle Click */
   const handleClick = () => {
+    // Trigger swipe for all cards
+    setCards((prevCards) => {
+      return prevCards.map((card, index) => ({
+        ...card,
+        x: index === 0 ? -500 : 0, // Swipe left for the first card
+      }));
+    });
+
     if (cards.length === 1) {
       // Trigger new stack animation
       setNewStack(true);
@@ -143,11 +154,11 @@ export default function ResponsivePicture() {
       >
         {cards.map((card, index) => (
           <motion.div
+            key={card.id}
+            onClick={handleClick} // All cards swipe when clicked
             onMouseEnter={handleMouseEnter}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
-            key={card.id}
-            onClick={handleClick}
             initial={{
               y: newStack && index === 0 ? 200 : card.offset, // New stack starts below
               opacity: newStack && index === 0 ? 0 : 1, // Fade in for new stack
@@ -155,10 +166,11 @@ export default function ResponsivePicture() {
             animate={{
               y: card.offset, // Move to its stack position
               opacity: 1, // Fully visible
-              x: index === 0 ? (cards.length === 1 ? -1000 : 0) : 0, // Swipe left only on top card
+              x: card.x || 0, // Move horizontally based on swipe animation
             }}
             exit={{
               opacity: index === 0 && cards.length === 1 ? 0 : 1, // Fade out
+              x: index === 0 ? (cards.length === 1 ? -1000 : 0) : 0,
             }}
             transition={{
               duration: 0.5,
@@ -176,33 +188,22 @@ export default function ResponsivePicture() {
           >
             <motion.div
               style={{
-                width: "100%",
-                height: "100%",
-                borderRadius: 5,
+                backgroundImage: `url(${image})`,
+                height: 640,
+                width: 458,
+                borderRadius: 10,
                 display: "flex",
                 placeItems: "center",
                 placeContent: "center",
-                backgroundImage: `url(${image})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 rotateX,
                 rotateY,
+                x,
+                y,
+                filter,
               }}
-            >
-              <motion.div
-                style={{
-                  x,
-                  y,
-                  filter,
-                  backgroundImage: `url(${image})`,
-                  height: 640,
-                  width: 458,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  borderRadius: 10,
-                }}
-              ></motion.div>
-            </motion.div>
+            ></motion.div>
           </motion.div>
         ))}
       </div>
