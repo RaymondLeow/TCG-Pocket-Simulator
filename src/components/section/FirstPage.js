@@ -4,7 +4,7 @@ import ResponsivePicture from "components/features/ResponsivePicture";
 
 const Section = tw.div`relative flex justify-center items-center h-screen`;
 const ParallaxSection = tw.div`absolute flex justify-center items-center flex-col`;
-const ProfilePicture = tw(ResponsivePicture)`absolute`;
+// const ProfilePicture = tw(ResponsivePicture)``;
 const TextFiller = tw.div`h-[170px]`;
 const HeightFiller = tw.div`h-[66px]`;
 const H1 = tw.h1`font-publicsans text-3xl md:text-5xl font-medium `;
@@ -14,8 +14,9 @@ const Italic = tw.span`font-bold`;
 
 export default function FirstPage() {
   return (
-    <Section>
-      <ProfilePicture></ProfilePicture>
-    </Section>
+    // <Section>
+    // <ProfilePicture></ProfilePicture>
+    <ResponsivePicture />
+    // </Section>
   );
 }

@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { motion, useSpring, useMotionTemplate, transform } from "framer-motion";
+import {
+  motion,
+  useSpring,
+  useMotionTemplate,
+  transform,
+  AnimatePresence,
+} from "framer-motion";
 
 const image =
   "https://www.pokemon-zone.com/assets/uploads/2024/08/Venusaur-ex-genetic-apex-1.webp";
@@ -21,15 +27,21 @@ const generateCards = (count) =>
   }));
 
 export default function ResponsivePicture() {
-  const [cards, setCards] = useState(generateCards(5));
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [newStack, setNewStack] = useState(false); // Track new stack animation
+  // State to manage the stack and card animations
+  const [cards, setCards] = useState([1, 2, 3, 4, 5]); // Initialize with 5 cards
+  const [newStackVisible, setNewStackVisible] = useState(false);
+  const [hoveredCardIndex, setHoveredCardIndex] = useState(null); // Track the hovered card index
+
+  // State for hover effect
   const [frame, setFrame] = useState({
     width: 0,
     height: 0,
     top: 0,
     left: 0,
   });
+
+  // State for image loading
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     preloadImage(image)
@@ -57,10 +69,7 @@ export default function ResponsivePicture() {
   const filter = useMotionTemplate`drop-shadow(${shadowX}px ${shadowY}px 20px rgba(0, 0, 68, 0.1))`;
 
   /* Convert cursor position values */
-  const convertCursorPosition = (e) => {
-    // Ensure frame is available before accessing
-    if (!frame) return;
-
+  const convertCursorPosition = (e, frame) => {
     const objectX = (e.nativeEvent.clientX - frame.left) / frame.width;
     const objectY = (e.nativeEvent.clientY - frame.top) / frame.height;
 
@@ -74,8 +83,9 @@ export default function ResponsivePicture() {
   };
 
   /* On Mouse Enter, get object frame and convert values */
-  const handleMouseEnter = (e) => {
+  const handleMouseEnter = (e, index) => {
     const currentElement = e.target.getBoundingClientRect();
+    setHoveredCardIndex(index); // Set the hovered card index
 
     setFrame({
       width: currentElement.width,
@@ -84,46 +94,42 @@ export default function ResponsivePicture() {
       left: currentElement.left,
     });
 
-    convertCursorPosition(e);
+    convertCursorPosition(e, currentElement);
   };
 
   /* On Mouse Move, convert values */
   const handleMouseMove = (e) => {
-    convertCursorPosition(e);
+    convertCursorPosition(e, frame);
   };
 
   /* On Mouse Leave, reset */
   const handleMouseLeave = (e) => {
-    rotateX.set(0);
-    rotateY.set(0);
-    x.set(0);
-    y.set(0);
-    shadowX.set(0);
-    shadowY.set(40);
+    if (hoveredCardIndex !== null) {
+      rotateX.set(0);
+      rotateY.set(0);
+      x.set(0);
+      y.set(0);
+      shadowX.set(0);
+      shadowY.set(40);
+      setHoveredCardIndex(null); // Reset hovered card index
+    }
   };
 
-  /* Handle Click */
-  const handleClick = () => {
-    // Trigger swipe for all cards
-    setCards((prevCards) => {
-      return prevCards.map((card, index) => ({
-        ...card,
-        x: index === 0 ? -500 : 0, // Swipe left for the first card
-      }));
-    });
-
+  // Click handler to swipe card left
+  const handleCardClick = () => {
     if (cards.length === 1) {
-      // Trigger new stack animation
-      setNewStack(true);
+      // Animate the last card upwards when it's clicked
+      setCards([]); // Remove the last card
 
-      // Generate new stack after animation
+      // Show new stack of cards
+      setNewStackVisible(true);
       setTimeout(() => {
-        setCards(generateCards(5));
-        setNewStack(false);
-      }, 500); // Match the animation duration
+        setCards([1, 2, 3, 4, 5]); // Reset the stack with new cards
+        setNewStackVisible(false);
+      }, 500); // Duration of the slide-up animation
     } else {
-      // Remove top card
-      setCards((prevCards) => prevCards.slice(1));
+      // Swipe the top card to the left (or another swipe action)
+      setCards((prev) => prev.slice(1));
     }
   };
 
@@ -145,68 +151,92 @@ export default function ResponsivePicture() {
         overflow: "hidden", // Prevent scrollbars
       }}
     >
-      <div
+      <motion.div
         style={{
-          position: "relative",
           width: 458,
           height: 640,
+          position: "relative",
         }}
       >
-        {cards.map((card, index) => (
-          <motion.div
-            key={card.id}
-            onClick={handleClick} // All cards swipe when clicked
-            onMouseEnter={handleMouseEnter}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            initial={{
-              y: newStack && index === 0 ? 200 : card.offset, // New stack starts below
-              opacity: newStack && index === 0 ? 0 : 1, // Fade in for new stack
-            }}
-            animate={{
-              y: card.offset, // Move to its stack position
-              opacity: 1, // Fully visible
-              x: card.x || 0, // Move horizontally based on swipe animation
-            }}
-            exit={{
-              opacity: index === 0 && cards.length === 1 ? 0 : 1, // Fade out
-              x: index === 0 ? (cards.length === 1 ? -1000 : 0) : 0,
-            }}
-            transition={{
-              duration: 0.5,
-              ease: "easeOut",
-            }}
-            style={{
-              position: "absolute",
-              top: `${card.offset}px`,
-              left: `${card.offset}px`,
-              width: "100%",
-              height: "100%",
-              cursor: "pointer",
-              zIndex: card.zIndex,
-            }}
-          >
+        <AnimatePresence>
+          {cards.map((card, index) => (
             <motion.div
+              key={index}
               style={{
-                backgroundImage: `url(${image})`,
-                height: 640,
                 width: 458,
-                borderRadius: 10,
-                display: "flex",
-                placeItems: "center",
-                placeContent: "center",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                rotateX,
-                rotateY,
+                height: 640,
+                position: "absolute",
+                top: `${(index - 4) * 20}px`, // Slightly offset each card
+                left: 0,
+                cursor: "pointer",
+                // zIndex: cards.length - index, // Ensure top card is always on top
                 x,
                 y,
+                rotateX,
+                rotateY,
                 filter,
+                backgroundImage: `url(${image})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                borderRadius: 10,
+                boxShadow: "0 10px 20px rgba(0, 0, 0, 0.15)",
+                transition: "transform 0.3s ease-out", // Smooth slide animation
               }}
-            ></motion.div>
+              onMouseEnter={(e) => handleMouseEnter(e, index)}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              onClick={handleCardClick}
+              exit={{
+                opacity: 0,
+                //y: -400, // Slide the card upwards when clicked
+                transition: { duration: 0.2 },
+              }}
+            />
+          ))}
+        </AnimatePresence>
+        {/* New stack (appears from below) */}
+        {newStackVisible && (
+          <motion.div
+            initial={{ y: 1000 }}
+            animate={{ y: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 30 }}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              transform: "translateX(-50%)",
+              width: 458,
+              height: 640,
+              backgroundImage: `url(${image})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              borderRadius: 10,
+            }}
+          >
+            {/* Render the new stack of 5 cards */}
+            {[1, 2, 3, 4, 5].map((_, index) => (
+              <motion.div
+                key={index}
+                style={{
+                  filter,
+                  width: 458,
+                  height: 640,
+                  position: "absolute",
+                  top: `${(index - 4) * 20}px`, // Slightly offset each card
+                  left: 0,
+                  cursor: "pointer",
+                  // zIndex: 5 - index, // Ensure the first card is on top
+                  backgroundImage: `url(${image})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  borderRadius: 10,
+                  boxShadow: "0 10px 20px rgba(0, 0, 0, 0.15)",
+                }}
+                onClick={handleCardClick}
+              />
+            ))}
           </motion.div>
-        ))}
-      </div>
+        )}
+      </motion.div>
     </motion.div>
   );
 }
