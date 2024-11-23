@@ -19,18 +19,10 @@ const preloadImage = (src) => {
   });
 };
 
-const generateCards = (count) =>
-  Array.from({ length: count }, (_, index) => ({
-    id: index,
-    offset: index * 5, // Ensures offset is calculated
-    zIndex: count - index,
-  }));
-
 export default function ResponsivePicture() {
   // State to manage the stack and card animations
   const [cards, setCards] = useState([1, 2, 3, 4, 5]); // Initialize with 5 cards
   const [newStackVisible, setNewStackVisible] = useState(false);
-  const [hoveredCardIndex, setHoveredCardIndex] = useState(null); // Track the hovered card index
 
   // State for hover effect
   const [frame, setFrame] = useState({
@@ -54,38 +46,32 @@ export default function ResponsivePicture() {
   }, []);
 
   /* Constants */
-  const rotateValue = 15;
-  const transformValue = rotateValue * 2;
   const springValue = { stiffness: 400, damping: 30 };
 
-  /* UseSpring MotionValues */
-  const rotateX = useSpring(0, springValue);
-  const rotateY = useSpring(0, springValue);
-  const x = useSpring(0, springValue);
-  const y = useSpring(0, springValue);
+  // /* UseSpring MotionValues */
   const shadowX = useSpring(0, springValue);
   const shadowY = useSpring(30, springValue);
 
-  const filter = useMotionTemplate`drop-shadow(${shadowX}px ${shadowY}px 20px rgba(0, 0, 68, 0.1))`;
+  const filter = useMotionTemplate`drop-shadow(${shadowX}px ${shadowY}px 20px rgba(0, 0, 68, 0.4))`;
+
+  // const springValue = { stiffness: 400, damping: 30 };
+  const rotateX = useSpring(0, springValue);
+  const rotateY = useSpring(0, springValue);
 
   /* Convert cursor position values */
   const convertCursorPosition = (e, frame) => {
     const objectX = (e.nativeEvent.clientX - frame.left) / frame.width;
     const objectY = (e.nativeEvent.clientY - frame.top) / frame.height;
 
-    rotateX.set(transform(objectY, [0, 1], [rotateValue, -rotateValue]));
-    rotateY.set(transform(objectX, [0, 1], [-rotateValue, rotateValue]));
-    x.set(transform(objectX, [0, 1], [-transformValue, transformValue]));
-    y.set(transform(objectY, [0, 1], [-transformValue, transformValue]));
-
     shadowX.set(transform(objectX, [0, 1], [20, -20]));
     shadowY.set(transform(objectY, [0, 1], [60, 20]));
+    rotateY.set(transform(objectX, [0, 1], [-15, 15]));
+    rotateX.set(transform(objectY, [0, 1], [15, -15]));
   };
 
   /* On Mouse Enter, get object frame and convert values */
-  const handleMouseEnter = (e, index) => {
+  const handleMouseEnter = (e) => {
     const currentElement = e.target.getBoundingClientRect();
-    setHoveredCardIndex(index); // Set the hovered card index
 
     setFrame({
       width: currentElement.width,
@@ -99,20 +85,18 @@ export default function ResponsivePicture() {
 
   /* On Mouse Move, convert values */
   const handleMouseMove = (e) => {
+    const frame = e.target.getBoundingClientRect();
     convertCursorPosition(e, frame);
+
+    // convertCursorPosition(e, frame);
   };
 
   /* On Mouse Leave, reset */
   const handleMouseLeave = (e) => {
-    if (hoveredCardIndex !== null) {
-      rotateX.set(0);
-      rotateY.set(0);
-      x.set(0);
-      y.set(0);
-      shadowX.set(0);
-      shadowY.set(40);
-      setHoveredCardIndex(null); // Reset hovered card index
-    }
+    shadowX.set(0);
+    shadowY.set(40);
+    rotateX.set(0);
+    rotateY.set(0);
   };
 
   // Click handler to swipe card left
@@ -159,40 +143,44 @@ export default function ResponsivePicture() {
         }}
       >
         <AnimatePresence>
-          {cards.map((card, index) => (
-            <motion.div
-              key={index}
-              style={{
-                width: 458,
-                height: 640,
-                position: "absolute",
-                top: `${(index - 4) * 20}px`, // Slightly offset each card
-                left: 0,
-                cursor: "pointer",
-                // zIndex: cards.length - index, // Ensure top card is always on top
-                x,
-                y,
-                rotateX,
-                rotateY,
-                filter,
-                backgroundImage: `url(${image})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                borderRadius: 10,
-                boxShadow: "0 10px 20px rgba(0, 0, 0, 0.15)",
-                transition: "transform 0.3s ease-out", // Smooth slide animation
-              }}
-              onMouseEnter={(e) => handleMouseEnter(e, index)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              onClick={handleCardClick}
-              exit={{
-                opacity: 0,
-                //y: -400, // Slide the card upwards when clicked
-                transition: { duration: 0.2 },
-              }}
-            />
-          ))}
+          {cards.map((card, index) => {
+            return (
+              <motion.div
+                key={index}
+                style={{
+                  width: 458,
+                  height: 640,
+                  position: "absolute",
+                  top: `${(index - 4) * 10}px`, // Slightly offset each card
+                  left: `${(index - 4) * -20}px`,
+                  cursor: "pointer",
+                  zIndex: index, // Ensure top card is always on top
+                  // x,
+                  // y,
+                  rotateX: rotateX, // Rotate more for back cards
+                  rotateY: rotateY,
+                  filter,
+                  backgroundImage: `url(${image})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  borderRadius: 10,
+                  boxShadow: "0 10px 20px rgba(0, 0, 0, 0.15)",
+                  transform: `translateZ(-${index * 50}px)`, // Add depth
+                  perspective: 1000,
+                  transition: "transform 0.3s ease-out", // Smooth slide animation
+                }}
+                onMouseEnter={(e) => handleMouseEnter(e, index)}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                onClick={handleCardClick}
+                exit={{
+                  opacity: 0,
+                  // y: 1000, // Slide the card upwards when clicked
+                  transition: { duration: 0.1 },
+                }}
+              />
+            );
+          })}
         </AnimatePresence>
         {/* New stack (appears from below) */}
         {newStackVisible && (
@@ -221,10 +209,9 @@ export default function ResponsivePicture() {
                   width: 458,
                   height: 640,
                   position: "absolute",
-                  top: `${(index - 4) * 20}px`, // Slightly offset each card
-                  left: 0,
+                  top: `${(index - 4) * 10}px`, // Slightly offset each card
+                  left: `${(index - 4) * -20}px`,
                   cursor: "pointer",
-                  // zIndex: 5 - index, // Ensure the first card is on top
                   backgroundImage: `url(${image})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
