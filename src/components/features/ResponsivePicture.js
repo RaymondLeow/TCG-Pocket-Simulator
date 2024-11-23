@@ -6,9 +6,17 @@ import {
   transform,
   AnimatePresence,
 } from "framer-motion";
+import { gamble } from "./Calculator";
 
-const image =
-  "https://www.pokemon-zone.com/assets/uploads/2024/08/Venusaur-ex-genetic-apex-1.webp";
+// Mock function to simulate fetching new images dynamically
+const fetchNewImages = () => {
+  // Here you could fetch the images dynamically, for example, from an API or generate random ones
+  let imageIds = gamble();
+  return imageIds.map(
+    (imageId) =>
+      `https://static0.gamerantimages.com/wordpress/wp-content/uploads/2024/11/${imageId}.png`
+  );
+};
 
 const preloadImage = (src) => {
   return new Promise((resolve, reject) => {
@@ -21,8 +29,11 @@ const preloadImage = (src) => {
 
 export default function ResponsivePicture() {
   // State to manage the stack and card animations
-  const [cards, setCards] = useState([1, 2, 3, 4, 5]); // Initialize with 5 cards
+  const [cards, setCards] = useState([0, 1, 2, 3, 4]); // Initialize with 5 cards
+  const [imageSet, setImageSet] = useState([]); // Initialize with an empty image set
   const [newStackVisible, setNewStackVisible] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [stackCounter, setStackCounter] = useState(0);
 
   // State for hover effect
   const [frame, setFrame] = useState({
@@ -32,18 +43,31 @@ export default function ResponsivePicture() {
     left: 0,
   });
 
-  // State for image loading
-  const [imageLoaded, setImageLoaded] = useState(false);
-
   useEffect(() => {
-    preloadImage(image)
-      .then(() => {
-        setImageLoaded(true);
-      })
-      .catch((error) => {
-        console.error("Error loading image:", error);
-      });
-  }, []);
+    // Preload images for the current stack
+    if (imageSet.length > 0) {
+      preloadImagesForStack(imageSet);
+    } else {
+      const newImages = fetchNewImages([0, 1, 2, 3, 4]); // Fetch new images for the stack
+      setImageSet(newImages);
+      preloadImagesForStack(newImages);
+    }
+  }, [imageSet]);
+
+  // Function to preload all images for the stack
+  const preloadImagesForStack = async (imageSet) => {
+    Promise.all(imageSet.map((img) => preloadImage(img)))
+      .then(() => setImageLoaded(true))
+      .catch((error) => console.error("Error loading images:", error));
+  };
+
+  // Function to fetch new images dynamically for the next stack
+  const fetchNewStack = async () => {
+    setStackCounter((prevCount) => prevCount + 1);
+    const newImages = await fetchNewImages(); // Fetch new images for the stack
+    setImageSet(newImages); // Update image set
+    setImageLoaded(false); // Reset loading state
+  };
 
   /* Constants */
   const springValue = { stiffness: 400, damping: 30 };
@@ -102,15 +126,16 @@ export default function ResponsivePicture() {
   // Click handler to swipe card left
   const handleCardClick = () => {
     if (cards.length === 1) {
-      // Animate the last card upwards when it's clicked
-      setCards([]); // Remove the last card
+      setCards([0, 1, 2, 3, 4]); // Reset the stack
+      setImageLoaded(false); // Reset image loaded state for new stack
 
-      // Show new stack of cards
+      fetchNewStack(); // Fetch new images for the next stack
+
       setNewStackVisible(true);
+
       setTimeout(() => {
-        setCards([1, 2, 3, 4, 5]); // Reset the stack with new cards
-        setNewStackVisible(false);
-      }, 500); // Duration of the slide-up animation
+        setNewStackVisible(false); // Hide the new stack after animation
+      }, 500); // Duration of the animation for sliding up
     } else {
       // Swipe the top card to the left (or another swipe action)
       setCards((prev) => prev.slice(1));
@@ -142,8 +167,21 @@ export default function ResponsivePicture() {
           position: "relative",
         }}
       >
+        <div
+          style={{
+            position: "absolute",
+            top: -50,
+            left: "50%",
+            transform: "translateX(-50%)",
+            fontSize: "32px",
+            fontWeight: "bold",
+            width: 400,
+          }}
+        >
+          Packs opened: {stackCounter}
+        </div>
         <AnimatePresence>
-          {cards.map((card, index) => {
+          {cards.map((cardIndex, index) => {
             return (
               <motion.div
                 key={index}
@@ -151,16 +189,14 @@ export default function ResponsivePicture() {
                   width: 458,
                   height: 640,
                   position: "absolute",
-                  top: `${(index - 4) * 10}px`, // Slightly offset each card
-                  left: `${(index - 4) * -20}px`,
+                  top: `${(index - 4) * -15}px`, // Slightly offset each card
+                  left: `${(index - 4) * 15}px`,
                   cursor: "pointer",
-                  zIndex: index, // Ensure top card is always on top
-                  // x,
-                  // y,
+                  zIndex: cards.length - index, // Ensure the top card is always on top
                   rotateX: rotateX, // Rotate more for back cards
                   rotateY: rotateY,
                   filter,
-                  backgroundImage: `url(${image})`,
+                  backgroundImage: `url(${imageSet[cardIndex]})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   borderRadius: 10,
@@ -169,7 +205,7 @@ export default function ResponsivePicture() {
                   perspective: 1000,
                   transition: "transform 0.3s ease-out", // Smooth slide animation
                 }}
-                onMouseEnter={(e) => handleMouseEnter(e, index)}
+                onMouseEnter={handleMouseEnter}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 onClick={handleCardClick}
@@ -194,14 +230,14 @@ export default function ResponsivePicture() {
               transform: "translateX(-50%)",
               width: 458,
               height: 640,
-              backgroundImage: `url(${image})`,
+              // backgroundImage: `url(${imageSet[0]})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               borderRadius: 10,
             }}
           >
             {/* Render the new stack of 5 cards */}
-            {[1, 2, 3, 4, 5].map((_, index) => (
+            {[0, 1, 2, 3, 4].map((cardIndex, index) => (
               <motion.div
                 key={index}
                 style={{
@@ -209,10 +245,10 @@ export default function ResponsivePicture() {
                   width: 458,
                   height: 640,
                   position: "absolute",
-                  top: `${(index - 4) * 10}px`, // Slightly offset each card
-                  left: `${(index - 4) * -20}px`,
+                  top: `${(index - 4) * -15}px`, // Slightly offset each card
+                  left: `${(index - 4) * 15}px`,
                   cursor: "pointer",
-                  backgroundImage: `url(${image})`,
+                  backgroundImage: `url(${imageSet[cardIndex]})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   borderRadius: 10,
