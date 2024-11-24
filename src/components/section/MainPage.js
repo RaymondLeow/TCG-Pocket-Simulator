@@ -1,15 +1,15 @@
 import tw from "twin.macro";
-import { useState } from "react";
-import ResponsivePicture from "components/features/ResponsivePicture";
-import { Header } from "components/features/Header";
+import Packs from "components/features/Packs";
 const Section = tw.div`relative flex justify-center items-center flex-col`;
 
-export default function MainPage() {
+const MainPage = ({ packData }) => {
   return (
     <>
       <Section>
-        <ResponsivePicture />
+        <Packs packData={packData} />
       </Section>
     </>
   );
-}
+};
+
+export default MainPage;

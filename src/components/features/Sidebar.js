@@ -46,10 +46,14 @@ const NavButton = tw.button`text-2xl font-bold`;
 
 const Image = tw.img`p-4`;
 
-const Sidebar = () => {
+const Sidebar = ({ onButtonClick }) => {
   const [sidebar, setSidebar] = useState(false);
 
   const showSidebar = () => setSidebar(!sidebar);
+
+  const handleClick = (packData) => {
+    onButtonClick(packData);
+  };
 
   return (
     <>
@@ -67,11 +71,20 @@ const Sidebar = () => {
       <SidebarNav sidebar={sidebar}>
         <SidebarWrap>
           <SidebarClose onClick={showSidebar}>X</SidebarClose>
-          <Image src={ApexMewtwoLogo} alt="Open Genetic Apex Mewtwo Pack" />
-          <Image src={ApexPikachuLogo} alt="Open Genetic Apex Pikachu Pack" />
+          <Image
+            src={ApexMewtwoLogo}
+            alt="Open Genetic Apex Mewtwo Pack"
+            onClick={() => handleClick("mewtwo")}
+          />
+          <Image
+            src={ApexPikachuLogo}
+            alt="Open Genetic Apex Pikachu Pack"
+            onClick={() => handleClick("pikachu")}
+          />
           <Image
             src={ApexCharizardLogo}
             alt="Open Genetic Apex Charizard Pack"
+            onClick={() => handleClick("charizard")}
           />
         </SidebarWrap>
       </SidebarNav>

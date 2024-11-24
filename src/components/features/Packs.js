@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   motion,
   useSpring,
   useMotionTemplate,
-  transform,
   AnimatePresence,
 } from "framer-motion";
 import { gamble as fetchNewImages } from "./Calculator";
@@ -22,7 +21,7 @@ const preloadImage = (src) => {
   });
 };
 
-export default function ResponsivePicture() {
+const Packs = ({ packData }) => {
   // State to manage the stack and card animations
   const [cards, setCards] = useState([0, 1, 2, 3, 4]); // Initialize with 5 cards
   const [imageSet, setImageSet] = useState([]); // Initialize with an empty image set
@@ -37,17 +36,35 @@ export default function ResponsivePicture() {
     top: 0,
     left: 0,
   });
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     // Preload images for the current stack
     if (imageSet.length > 0) {
       preloadImagesForStack(imageSet);
     } else {
-      const newImages = fetchNewImages([0, 1, 2, 3, 4]); // Fetch new images for the stack
+      const newImages = fetchNewImages(packData, [0, 1, 2, 3, 4]); // Fetch new images for the stack
       setImageSet(newImages);
       preloadImagesForStack(newImages);
     }
   }, [imageSet]);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false; // Skip first render
+      return;
+    }
+    setCards([0, 1, 2, 3, 4]); // Reset the stack
+    setImageLoaded(false); // Reset image loaded state for new stack
+
+    fetchNewStack(); // Fetch new images for the next stack
+
+    setNewStackVisible(true);
+
+    setTimeout(() => {
+      setNewStackVisible(false); // Hide the new stack after animation
+    }, 500); // Duration of the animation for sliding up
+  }, [packData]);
 
   // Function to preload all images for the stack
   const preloadImagesForStack = async (imageSet) => {
@@ -59,7 +76,7 @@ export default function ResponsivePicture() {
   // Function to fetch new images dynamically for the next stack
   const fetchNewStack = async () => {
     setStackCounter((prevCount) => prevCount + 1);
-    const newImages = await fetchNewImages(); // Fetch new images for the stack
+    const newImages = await fetchNewImages(packData); // Fetch new images for the stack
     setImageSet(newImages); // Update image set
     setImageLoaded(false); // Reset loading state
   };
@@ -153,8 +170,8 @@ export default function ResponsivePicture() {
     >
       <motion.div
         style={{
-          width: 458,
-          height: 640,
+          width: 367,
+          height: 512,
           position: "relative",
         }}
       >
@@ -179,12 +196,12 @@ export default function ResponsivePicture() {
                 <motion.div
                   key={`stack-${stackCounter}-card-${cardIndex}`}
                   style={{
-                    width: 458,
-                    height: 640,
+                    width: 367,
+                    height: 512,
                     position: "absolute",
                     // top: `${(index - 4) * -15}px`, // Slightly offset each card
                     top: `${(cards.length - index - 1) * 10}px`, // Slight offset for each card
-                    left: `${(index / cards.length) * 50}px`,
+                    left: `${(index / cards.length) * 30}px`,
                     cursor: "pointer",
                     zIndex: cards.length - index, // Ensure the top card is always on top
                     rotateX: rotateX,
@@ -193,8 +210,10 @@ export default function ResponsivePicture() {
                     backgroundImage: `url(${imageSet[cardIndex]})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
                     borderRadius: 10,
                     boxShadow: "0 10px 20px rgba(0, 0, 0, 0.15)",
+                    imageRendering: "high-quality",
                   }}
                   onMouseEnter={onMouseEnter}
                   onMouseMove={onMouseMove}
@@ -221,8 +240,8 @@ export default function ResponsivePicture() {
               position: "absolute",
               bottom: 0,
               transform: "translateX(-50%)",
-              width: 458,
-              height: 640,
+              width: 367,
+              height: 512,
               // backgroundImage: `url(${imageSet[0]})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
@@ -235,11 +254,11 @@ export default function ResponsivePicture() {
                 key={index}
                 style={{
                   filter,
-                  width: 458,
-                  height: 640,
+                  width: 367,
+                  height: 512,
                   position: "absolute",
                   top: `${(cards.length - index - 1) * 10}px`, // Slight offset for each card
-                  left: `${(index / cards.length) * 50}px`,
+                  left: `${(index / cards.length) * 30}px`,
                   zIndex: cards.length - index, // Ensure the top card is always on top
                   cursor: "pointer",
                   backgroundImage: `url(${imageSet[cardIndex]})`,
@@ -256,4 +275,6 @@ export default function ResponsivePicture() {
       </motion.div>
     </motion.div>
   );
-}
+};
+
+export default Packs;

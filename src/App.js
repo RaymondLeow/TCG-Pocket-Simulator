@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import tw from "twin.macro";
 import GlobalStyles from "styles/GlobalStyles";
 import Sidebar from "components/features/Sidebar.js";
@@ -8,12 +8,18 @@ import StartPage from "./StartPage.js";
 const Container = tw.div`w-fit lg:w-full`;
 
 const App = () => {
+  const [packData, setPackData] = useState("mewtwo");
+
+  const handleChangePack = (pack) => {
+    setPackData(pack);
+  };
+
   return (
     <>
       <Container>
-        <Sidebar />
+        <Sidebar onButtonClick={handleChangePack} />
         <Routes>
-          <Route path="/" element={<StartPage />} />
+          <Route path="/" element={<StartPage packData={packData} />} />
         </Routes>
       </Container>
     </>

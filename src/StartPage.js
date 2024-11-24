@@ -1,13 +1,13 @@
 import MainPage from "./components/section/MainPage";
 import React from "react";
 import tw from "twin.macro";
-const Section = tw.div`lg:overflow-x-hidden`;
+const Section = tw.div`lg:overflow-hidden`;
 
-const StartPage = () => {
+const StartPage = ({ packData }) => {
   return (
     <>
       <Section>
-        <MainPage />
+        <MainPage packData={packData} />
       </Section>
     </>
   );

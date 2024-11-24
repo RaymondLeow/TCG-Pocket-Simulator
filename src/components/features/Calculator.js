@@ -1,6 +1,12 @@
 // Probabilities for each tier (cumulative probabilities)
 
-import { mewtwoPack, allPack, getImage } from "components/resources/Prizes";
+import {
+  mewtwoPack,
+  pikachuPack,
+  charizardPack,
+  allPack,
+  getImage,
+} from "components/resources/Prizes";
 
 // For the fourth roll
 const tierProbabilitiesFourth = [
@@ -32,27 +38,40 @@ function getTier(probabilities) {
   }
 }
 
+function getPackType(packData) {
+  switch (packData) {
+    case "mewtwo":
+      return mewtwoPack;
+    case "pikachu":
+      return pikachuPack;
+    default:
+      return charizardPack;
+  }
+}
+
 // Function to roll and determine the prizes
-export function gamble() {
+export function gamble(packData) {
   const result = [];
   let prizes = [];
 
+  const pack = getPackType(packData);
+
   // First three rolls always tier1
   for (let i = 0; i < 3; i++) {
-    prizes = mewtwoPack.diamond1.concat(allPack.diamond1);
+    prizes = pack.diamond1.concat(allPack.diamond1);
     const prize = prizes[Math.floor(Math.random() * prizes.length)];
     result.push(getImage(prize));
   }
 
   // Fourth roll (use tierProbabilitiesFourth)
   const fourthTier = getTier(tierProbabilitiesFourth);
-  prizes = mewtwoPack[fourthTier].concat(allPack[fourthTier]);
+  prizes = pack[fourthTier].concat(allPack[fourthTier]);
   const fourthPrize = prizes[Math.floor(Math.random() * prizes.length)];
   result.push(getImage(fourthPrize));
 
   // Fifth roll (use tierProbabilitiesFifth)
   const fifthTier = getTier(tierProbabilitiesFifth);
-  prizes = mewtwoPack[fifthTier].concat(allPack[fifthTier]);
+  prizes = pack[fifthTier].concat(allPack[fifthTier]);
   const fifthPrize = prizes[Math.floor(Math.random() * prizes.length)];
   result.push(getImage(fifthPrize));
 
