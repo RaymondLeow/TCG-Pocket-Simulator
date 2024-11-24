@@ -26,3 +26,6 @@ package-lock.json
 package.json
 
 Prizes.js
+
+.gitignore
+yarn.lock
