@@ -1,3 +1,4 @@
+import tw from "twin.macro";
 import React, { useState, useEffect } from "react";
 import {
   motion,
@@ -12,6 +13,9 @@ import {
   handleMouseLeave,
   handleMouseMove,
 } from "utils/MouseEvents";
+
+const Section = tw.div`relative flex justify-center items-center h-screen flex-col`;
+
 // Mock function to simulate fetching new images dynamically
 const fetchNewImages = () => {
   // Here you could fetch the images dynamically, for example, from an API or generate random ones
@@ -176,6 +180,7 @@ export default function ResponsivePicture() {
             fontSize: "32px",
             fontWeight: "bold",
             width: 400,
+            textAlign: "center",
           }}
         >
           Packs opened: {stackCounter}
@@ -192,7 +197,7 @@ export default function ResponsivePicture() {
                     position: "absolute",
                     // top: `${(index - 4) * -15}px`, // Slightly offset each card
                     top: `${(cards.length - index - 1) * 10}px`, // Slight offset for each card
-                    left: `${(index - 4) * 15}px`,
+                    left: `${(index / cards.length) * 50}px`,
                     cursor: "pointer",
                     zIndex: cards.length - index, // Ensure the top card is always on top
                     rotateX: rotateX,
@@ -246,8 +251,8 @@ export default function ResponsivePicture() {
                   width: 458,
                   height: 640,
                   position: "absolute",
-                  top: `${(index - 4) * -15}px`, // Slightly offset each card
-                  left: `${(index - 4) * 15}px`,
+                  top: `${(cards.length - index - 1) * 10}px`, // Slight offset for each card
+                  left: `${(index / cards.length) * 50}px`,
                   zIndex: cards.length - index, // Ensure the top card is always on top
                   cursor: "pointer",
                   backgroundImage: `url(${imageSet[cardIndex]})`,
