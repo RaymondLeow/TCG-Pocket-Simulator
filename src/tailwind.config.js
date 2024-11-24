@@ -818,6 +818,7 @@ module.exports = {
     transitionDuration: ["responsive"],
   },
   corePlugins: {},
+  content: ["./components/**/*.{html,js}"],
   plugins: [
     function ({ addUtilities }) {
       const newUtilities = {

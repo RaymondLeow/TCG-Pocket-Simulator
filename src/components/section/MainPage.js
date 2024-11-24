@@ -1,15 +1,15 @@
 import tw from "twin.macro";
+import { useState } from "react";
 import ResponsivePicture from "components/features/ResponsivePicture";
-import myImage from "../../images/title-logo.png";
-
-const Section = tw.div`relative flex justify-center items-center h-screen flex-col`;
-const Image = tw.img`w-[300px] h-auto`;
+import { Header } from "components/features/Header";
+const Section = tw.div`relative flex justify-center items-center flex-col`;
 
 export default function MainPage() {
   return (
-    <Section>
-      <Image src={myImage} alt="Title" />
-      <ResponsivePicture />
-    </Section>
+    <>
+      <Section>
+        <ResponsivePicture />
+      </Section>
+    </>
   );
 }

@@ -143,7 +143,7 @@ export default function ResponsivePicture() {
       transition={{ duration: 0.5, ease: "easeInOut" }}
       style={{
         width: "100vw",
-        height: "100vh",
+        height: "calc(100vh - 109px)",
         display: "flex",
         placeItems: "center",
         placeContent: "center",
