@@ -41,17 +41,37 @@ const SidebarWrap = styled.div`
   width: 100%;
 `;
 
+const ImageButtonImage = styled.img`
+  padding: 1rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05) translateY(-5px);
+  }
+
+  &:active {
+    transform: translateY(5px);
+  }
+`;
+
 const SidebarClose = tw.button`p-4 text-2xl font-bold`;
 const NavButton = tw.button`text-2xl font-bold`;
 
-const Image = tw.img`p-4`;
+const ImageButton = ({ imageSrc, packData, alt, onButtonClick }) => {
+  const handleClick = () => {
+    onButtonClick(packData);
+  };
+
+  return <ImageButtonImage src={imageSrc} alt={alt} onClick={handleClick} />;
+};
 
 const Sidebar = ({ onButtonClick }) => {
   const [sidebar, setSidebar] = useState(false);
 
   const showSidebar = () => setSidebar(!sidebar);
 
-  const handleClick = (packData) => {
+  const handleButtonClick = (packData) => {
     onButtonClick(packData);
   };
 
@@ -71,20 +91,23 @@ const Sidebar = ({ onButtonClick }) => {
       <SidebarNav sidebar={sidebar}>
         <SidebarWrap>
           <SidebarClose onClick={showSidebar}>X</SidebarClose>
-          <Image
-            src={ApexMewtwoLogo}
+          <ImageButton
+            imageSrc={ApexMewtwoLogo}
             alt="Open Genetic Apex Mewtwo Pack"
-            onClick={() => handleClick("mewtwo")}
+            packData="mewtwo"
+            onButtonClick={() => handleButtonClick("mewtwo")}
           />
-          <Image
-            src={ApexPikachuLogo}
+          <ImageButton
+            imageSrc={ApexPikachuLogo}
             alt="Open Genetic Apex Pikachu Pack"
-            onClick={() => handleClick("pikachu")}
+            packData="pikachu"
+            onButtonClick={() => handleButtonClick("pikachu")}
           />
-          <Image
-            src={ApexCharizardLogo}
+          <ImageButton
+            imageSrc={ApexCharizardLogo}
             alt="Open Genetic Apex Charizard Pack"
-            onClick={() => handleClick("charizard")}
+            packData="charizard"
+            onButtonClick={() => handleButtonClick("charizard")}
           />
         </SidebarWrap>
       </SidebarNav>
