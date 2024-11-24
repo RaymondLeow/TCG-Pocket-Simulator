@@ -1,6 +1,6 @@
 // Probabilities for each tier (cumulative probabilities)
 
-import { mewtwoPack, allPack } from "components/resources/Prizes";
+import { mewtwoPack, allPack, getImage } from "components/resources/Prizes";
 
 // For the fourth roll
 const tierProbabilitiesFourth = [
@@ -41,20 +41,20 @@ export function gamble() {
   for (let i = 0; i < 3; i++) {
     prizes = mewtwoPack.diamond1.concat(allPack.diamond1);
     const prize = prizes[Math.floor(Math.random() * prizes.length)];
-    result.push(prize);
+    result.push(getImage(prize));
   }
 
   // Fourth roll (use tierProbabilitiesFourth)
   const fourthTier = getTier(tierProbabilitiesFourth);
   prizes = mewtwoPack[fourthTier].concat(allPack[fourthTier]);
   const fourthPrize = prizes[Math.floor(Math.random() * prizes.length)];
-  result.push(fourthPrize);
+  result.push(getImage(fourthPrize));
 
   // Fifth roll (use tierProbabilitiesFifth)
   const fifthTier = getTier(tierProbabilitiesFifth);
   prizes = mewtwoPack[fifthTier].concat(allPack[fifthTier]);
   const fifthPrize = prizes[Math.floor(Math.random() * prizes.length)];
-  result.push(fifthPrize);
+  result.push(getImage(fifthPrize));
 
   return result;
 }

@@ -1,4 +1,3 @@
-import tw from "twin.macro";
 import React, { useState, useEffect } from "react";
 import {
   motion,
@@ -7,24 +6,12 @@ import {
   transform,
   AnimatePresence,
 } from "framer-motion";
-import { gamble } from "./Calculator";
+import { gamble as fetchNewImages } from "./Calculator";
 import {
   handleMouseEnter,
   handleMouseLeave,
   handleMouseMove,
 } from "utils/MouseEvents";
-
-const Section = tw.div`relative flex justify-center items-center h-screen flex-col`;
-
-// Mock function to simulate fetching new images dynamically
-const fetchNewImages = () => {
-  // Here you could fetch the images dynamically, for example, from an API or generate random ones
-  let imageIds = gamble();
-  return imageIds.map(
-    (imageId) =>
-      `https://static0.gamerantimages.com/wordpress/wp-content/uploads/2024/11/${imageId}.png`
-  );
-};
 
 const preloadImage = (src) => {
   return new Promise((resolve, reject) => {
