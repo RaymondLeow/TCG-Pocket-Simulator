@@ -180,12 +180,12 @@ export default function ResponsivePicture() {
         >
           Packs opened: {stackCounter}
         </div>
-        <AnimatePresence>
+        <AnimatePresence mode="popLayout">
           {!newStackVisible &&
             cards.map((cardIndex, index) => {
               return (
                 <motion.div
-                  key={`stack-${stackCounter}-card-${index}`}
+                  key={`stack-${stackCounter}-card-${cardIndex}`}
                   style={{
                     width: 458,
                     height: 640,
@@ -195,8 +195,8 @@ export default function ResponsivePicture() {
                     left: `${(index - 4) * 15}px`,
                     cursor: "pointer",
                     zIndex: cards.length - index, // Ensure the top card is always on top
-                    rotateX: index === 0 ? rotateX : 0, // Rotate more for back cards
-                    rotateY: index === 0 ? rotateY : 0,
+                    rotateX: rotateX,
+                    rotateY: rotateY,
                     filter,
                     backgroundImage: `url(${imageSet[cardIndex]})`,
                     backgroundSize: "cover",
@@ -209,11 +209,11 @@ export default function ResponsivePicture() {
                   onMouseLeave={onMouseLeave}
                   onClick={handleCardClick}
                   exit={{
-                    opacity: 0,
-                    x: -1000, // Smoothly swipe out left
+                    // opacity: 0,
+                    x: -2000, // Smoothly swipe out left
 
                     // y: 1000, // Slide the card upwards when clicked
-                    transition: { duration: 2 },
+                    transition: { duration: 0.2 },
                   }}
                 />
               );
