@@ -1,13 +1,14 @@
 {
   "files": {
-    "main.js": "/TCG-Pocket-Simulator/static/js/main.c8daaa6c.js",
+    "main.js": "/TCG-Pocket-Simulator/static/js/main.a671544f.js",
     "static/media/title-logo.png": "/TCG-Pocket-Simulator/static/media/title-logo.ab9f0b6405ced6c6b7ac.png",
     "static/media/genetic-apex-mewtwo-logo.png": "/TCG-Pocket-Simulator/static/media/genetic-apex-mewtwo-logo.628662ed54534be9191d.png",
     "static/media/genetic-apex-pikachu-logo.png": "/TCG-Pocket-Simulator/static/media/genetic-apex-pikachu-logo.4e6fbc139386c7485475.png",
+    "static/media/crown.png": "/TCG-Pocket-Simulator/static/media/crown.328a6506801973239aca.png",
     "index.html": "/TCG-Pocket-Simulator/index.html",
-    "main.c8daaa6c.js.map": "/TCG-Pocket-Simulator/static/js/main.c8daaa6c.js.map"
+    "main.a671544f.js.map": "/TCG-Pocket-Simulator/static/js/main.a671544f.js.map"
   },
   "entrypoints": [
-    "static/js/main.c8daaa6c.js"
+    "static/js/main.a671544f.js"
   ]
 }
