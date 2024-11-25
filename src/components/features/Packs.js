@@ -11,6 +11,7 @@ import {
   handleMouseLeave,
   handleMouseMove,
 } from "utils/MouseEvents";
+import { useData } from "components/context/DataContext";
 
 const preloadImage = (src) => {
   return new Promise((resolve, reject) => {
@@ -22,6 +23,8 @@ const preloadImage = (src) => {
 };
 
 const Packs = ({ packData }) => {
+  const { setData } = useData();
+
   // State to manage the stack and card animations
   const [cards, setCards] = useState([0, 1, 2, 3, 4]); // Initialize with 5 cards
   const [imageSet, setImageSet] = useState([]); // Initialize with an empty image set
@@ -68,7 +71,7 @@ const Packs = ({ packData }) => {
 
   // Function to preload all images for the stack
   const preloadImagesForStack = async (imageSet) => {
-    Promise.all(imageSet.map((img) => preloadImage(img)))
+    Promise.all(imageSet.map((img) => preloadImage(img.image)))
       .then(() => setImageLoaded(true))
       .catch((error) => console.error("Error loading images:", error));
   };
@@ -96,6 +99,7 @@ const Packs = ({ packData }) => {
 
   // Click handler to swipe card left
   const handleCardClick = () => {
+    setData(stackCounter);
     if (cards.length === 1) {
       setCards([0, 1, 2, 3, 4]); // Reset the stack
       setImageLoaded(false); // Reset image loaded state for new stack
@@ -189,12 +193,13 @@ const Packs = ({ packData }) => {
         >
           Packs opened: {stackCounter}
         </div>
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence>
           {!newStackVisible &&
-            cards.map((cardIndex, index) => {
+            imageSet.length > 0 &&
+            cards.map((card, index) => {
               return (
                 <motion.div
-                  key={`stack-${stackCounter}-card-${cardIndex}`}
+                  key={`stack-${stackCounter}-card-${card}`}
                   style={{
                     width: 367,
                     height: 512,
@@ -207,7 +212,7 @@ const Packs = ({ packData }) => {
                     rotateX: rotateX,
                     rotateY: rotateY,
                     filter,
-                    backgroundImage: `url(${imageSet[cardIndex]})`,
+                    backgroundImage: `url(${imageSet[card].image})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
@@ -249,7 +254,7 @@ const Packs = ({ packData }) => {
             }}
           >
             {/* Render the new stack of 5 cards */}
-            {[0, 1, 2, 3, 4].map((cardIndex, index) => (
+            {[0, 1, 2, 3, 4].map((card, index) => (
               <motion.div
                 key={index}
                 style={{
@@ -261,7 +266,7 @@ const Packs = ({ packData }) => {
                   left: `${(index / cards.length) * 30}px`,
                   zIndex: cards.length - index, // Ensure the top card is always on top
                   cursor: "pointer",
-                  backgroundImage: `url(${imageSet[cardIndex]})`,
+                  backgroundImage: `url(${imageSet[index].image})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   borderRadius: 10,

@@ -5,11 +5,14 @@ import Header from "./Header";
 import ApexCharizardLogo from "../../images/genetic-apex-charizard-logo.png";
 import ApexMewtwoLogo from "../../images/genetic-apex-mewtwo-logo.png";
 import ApexPikachuLogo from "../../images/genetic-apex-pikachu-logo.png";
+import { useData } from "../context/DataContext";
 
 const Nav = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  position: relative;
 `;
 
 const NavIcon = styled.div`
@@ -19,13 +22,21 @@ const NavIcon = styled.div`
 `;
 
 const SidebarNav = styled.nav`
-  background: #fecc01;
+  border-right: 3px solid #232323;
+  border-left: 3px solid #232323;
+  background: #fff;
   height: 100vh;
   display: flex;
   justify-content: center;
+  width: 200px;
   position: fixed;
   top: 0;
-  left: ${({ sidebar }) => (sidebar ? "0" : "-100%")};
+  left: ${({ sidebar, left }) => {
+    if (left) {
+      return sidebar ? "0" : "-100%";
+    }
+    return sidebar ? "calc(100vw - 200px)" : "100%";
+  }};
   transition: 250ms;
   z-index: 10;
 `;
@@ -55,8 +66,19 @@ const ImageButtonImage = styled.img`
   }
 `;
 
-const SidebarClose = tw.button`p-4 text-2xl font-bold`;
-const NavButton = tw.button`text-2xl font-bold`;
+const SidebarClose = styled.button`
+  padding: 1rem;
+  font-size: 2.25rem;
+  font-weight: bold;
+  float: ${({ left }) => {
+    if (left) {
+      return "left";
+    }
+    return "right";
+  }};
+`;
+
+const NavButton = tw.button`text-4xl font-bold`;
 
 const ImageButton = ({ imageSrc, packData, alt, onButtonClick }) => {
   const handleClick = () => {
@@ -67,9 +89,13 @@ const ImageButton = ({ imageSrc, packData, alt, onButtonClick }) => {
 };
 
 const Sidebar = ({ onButtonClick }) => {
-  const [sidebar, setSidebar] = useState(false);
+  const { data } = useData();
 
-  const showSidebar = () => setSidebar(!sidebar);
+  const [leftSidebar, setLeftSidebar] = useState(false);
+  const [rightSidebar, setRightbar] = useState(false);
+
+  const showLeftSidebar = () => setLeftSidebar(!leftSidebar);
+  const showRightSidebar = () => setRightbar(!rightSidebar);
 
   const handleButtonClick = (packData) => {
     onButtonClick(packData);
@@ -79,18 +105,20 @@ const Sidebar = ({ onButtonClick }) => {
     <>
       <Nav>
         <NavIcon to="#">
-          <NavButton onClick={showSidebar}>☰</NavButton>
+          <NavButton onClick={showLeftSidebar}>☰</NavButton>
         </NavIcon>
         <CenterContainer>
           <Header />
         </CenterContainer>
         <NavIcon to="#">
-          {/* <button onClick={showSidebar}>☰</button> */}
+          <NavButton onClick={showRightSidebar}>⧗</NavButton>
         </NavIcon>
       </Nav>
-      <SidebarNav sidebar={sidebar}>
+      <SidebarNav sidebar={leftSidebar} left={true}>
         <SidebarWrap>
-          <SidebarClose onClick={showSidebar}>X</SidebarClose>
+          <SidebarClose onClick={showLeftSidebar} left={true}>
+            ☰
+          </SidebarClose>
           <ImageButton
             imageSrc={ApexMewtwoLogo}
             alt="Open Genetic Apex Mewtwo Pack"
@@ -109,6 +137,16 @@ const Sidebar = ({ onButtonClick }) => {
             packData="charizard"
             onButtonClick={() => handleButtonClick("charizard")}
           />
+        </SidebarWrap>
+      </SidebarNav>
+      <SidebarNav sidebar={rightSidebar} left={false}>
+        <SidebarWrap>
+          <SidebarClose onClick={showRightSidebar} left={false}>
+            ⧗
+          </SidebarClose>
+          <SidebarClose onClick={showRightSidebar} left={false}>
+            {data}
+          </SidebarClose>
         </SidebarWrap>
       </SidebarNav>
     </>

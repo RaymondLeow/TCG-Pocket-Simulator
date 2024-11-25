@@ -60,20 +60,29 @@ export function gamble(packData) {
   for (let i = 0; i < 3; i++) {
     prizes = pack.diamond1.concat(allPack.diamond1);
     const prize = prizes[Math.floor(Math.random() * prizes.length)];
-    result.push(getImage(prize));
+    prize.tier = "diamond1";
+    prize.image = getImage(prize.id);
+    prize.packType = pack;
+    result.push(prize);
   }
 
   // Fourth roll (use tierProbabilitiesFourth)
   const fourthTier = getTier(tierProbabilitiesFourth);
   prizes = pack[fourthTier].concat(allPack[fourthTier]);
   const fourthPrize = prizes[Math.floor(Math.random() * prizes.length)];
-  result.push(getImage(fourthPrize));
+  fourthPrize.tier = fourthTier;
+  fourthPrize.image = getImage(fourthPrize.id);
+  fourthPrize.packType = pack;
+  result.push(fourthPrize);
 
   // Fifth roll (use tierProbabilitiesFifth)
   const fifthTier = getTier(tierProbabilitiesFifth);
   prizes = pack[fifthTier].concat(allPack[fifthTier]);
   const fifthPrize = prizes[Math.floor(Math.random() * prizes.length)];
-  result.push(getImage(fifthPrize));
+  fifthPrize.tier = fifthTier;
+  fifthPrize.image = getImage(fifthPrize.id);
+  fifthPrize.packType = pack;
+  result.push(fifthPrize);
 
   return result;
 }
