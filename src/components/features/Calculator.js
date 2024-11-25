@@ -44,8 +44,10 @@ function getPackType(packData) {
       return mewtwoPack;
     case "pikachu":
       return pikachuPack;
-    default:
+    case "charizard":
       return charizardPack;
+    default:
+      return allPack;
   }
 }
 
@@ -53,35 +55,39 @@ function getPackType(packData) {
 export function gamble(packData) {
   const result = [];
   let prizes = [];
+  let position = 0;
 
   const pack = getPackType(packData);
 
   // First three rolls always tier1
   for (let i = 0; i < 3; i++) {
     prizes = pack.diamond1.concat(allPack.diamond1);
-    const prize = prizes[Math.floor(Math.random() * prizes.length)];
+    position = Math.floor(Math.random() * prizes.length);
+    const prize = prizes[position];
     prize.tier = "diamond1";
     prize.image = getImage(prize.id);
-    prize.packType = pack;
+    prize.packType = position >= pack.diamond1.length ? "all" : packData;
     result.push(prize);
   }
 
   // Fourth roll (use tierProbabilitiesFourth)
   const fourthTier = getTier(tierProbabilitiesFourth);
   prizes = pack[fourthTier].concat(allPack[fourthTier]);
-  const fourthPrize = prizes[Math.floor(Math.random() * prizes.length)];
+  position = Math.floor(Math.random() * prizes.length);
+  const fourthPrize = prizes[position];
   fourthPrize.tier = fourthTier;
   fourthPrize.image = getImage(fourthPrize.id);
-  fourthPrize.packType = pack;
+  fourthPrize.packType = position >= pack[fourthTier].length ? "all" : packData;
   result.push(fourthPrize);
 
   // Fifth roll (use tierProbabilitiesFifth)
   const fifthTier = getTier(tierProbabilitiesFifth);
   prizes = pack[fifthTier].concat(allPack[fifthTier]);
-  const fifthPrize = prizes[Math.floor(Math.random() * prizes.length)];
+  position = Math.floor(Math.random() * prizes.length);
+  const fifthPrize = prizes[position];
   fifthPrize.tier = fifthTier;
   fifthPrize.image = getImage(fifthPrize.id);
-  fifthPrize.packType = pack;
+  fifthPrize.packType = position >= pack[fifthTier].length ? "all" : packData;
   result.push(fifthPrize);
 
   return result;

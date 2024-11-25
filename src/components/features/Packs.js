@@ -79,6 +79,7 @@ const Packs = ({ packData }) => {
   // Function to fetch new images dynamically for the next stack
   const fetchNewStack = async () => {
     setStackCounter((prevCount) => prevCount + 1);
+    setData(stackCounter);
     const newImages = await fetchNewImages(packData); // Fetch new images for the stack
     setImageSet(newImages); // Update image set
     setImageLoaded(false); // Reset loading state
@@ -99,8 +100,8 @@ const Packs = ({ packData }) => {
 
   // Click handler to swipe card left
   const handleCardClick = () => {
-    setData(stackCounter);
     if (cards.length === 1) {
+      setData(imageSet[cards[0]]);
       setCards([0, 1, 2, 3, 4]); // Reset the stack
       setImageLoaded(false); // Reset image loaded state for new stack
 
@@ -114,6 +115,7 @@ const Packs = ({ packData }) => {
     } else {
       // Swipe the top card to the left (or another swipe action)
       setCards((prev) => prev.slice(1));
+      setData(imageSet[cards[0]]);
     }
   };
 
@@ -166,9 +168,8 @@ const Packs = ({ packData }) => {
         width: "100vw",
         height: "calc(100vh - 109px)",
         display: "flex",
-        placeItems: "center",
         placeContent: "center",
-        perspective: 1200,
+        paddingTop: "3rem",
         overflow: "hidden", // Prevent scrollbars
       }}
     >
@@ -179,20 +180,6 @@ const Packs = ({ packData }) => {
           position: "relative",
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            top: -50,
-            left: "50%",
-            transform: "translateX(-50%)",
-            fontSize: "32px",
-            fontWeight: "bold",
-            width: 400,
-            textAlign: "center",
-          }}
-        >
-          Packs opened: {stackCounter}
-        </div>
         <AnimatePresence>
           {!newStackVisible &&
             imageSet.length > 0 &&

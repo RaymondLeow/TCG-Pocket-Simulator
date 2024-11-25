@@ -66,6 +66,16 @@ const ImageButtonImage = styled.img`
   }
 `;
 
+const TierImage = styled.img`
+  margin: 0.5rem;
+  height: 25px;
+`;
+
+const SidebarButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
 const SidebarClose = styled.button`
   padding: 1rem;
   font-size: 2.25rem;
@@ -77,6 +87,17 @@ const SidebarClose = styled.button`
     return "right";
   }};
 `;
+
+const TrackerContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const Separator = styled.div`
+  margin-top: 2rem;
+`;
+
+const TrackerText = tw.div`text-xl font-bold p-2`;
 
 const NavButton = tw.button`text-4xl font-bold`;
 
@@ -141,12 +162,43 @@ const Sidebar = ({ onButtonClick }) => {
       </SidebarNav>
       <SidebarNav sidebar={rightSidebar} left={false}>
         <SidebarWrap>
-          <SidebarClose onClick={showRightSidebar} left={false}>
-            ⧗
-          </SidebarClose>
-          <SidebarClose onClick={showRightSidebar} left={false}>
-            {data}
-          </SidebarClose>
+          <SidebarButtonContainer>
+            <SidebarClose onClick={showRightSidebar} left={false}>
+              ⧗
+            </SidebarClose>
+          </SidebarButtonContainer>
+          <TrackerContainer>
+            <TrackerText>Opened</TrackerText>
+            <TrackerText>{data.packsOpened}</TrackerText>
+          </TrackerContainer>
+          <Separator />
+          {Object.keys(data.uniqueTracker).map((key) => {
+            return (
+              <TrackerContainer key={`tracker-${key}`}>
+                <TrackerText>{data.uniqueTracker[key].title}</TrackerText>
+                <TrackerText>
+                  {data.uniqueTracker[key].collected} /{" "}
+                  {data.uniqueTracker[key].maxUnique}
+                </TrackerText>
+              </TrackerContainer>
+            );
+          })}
+          <Separator />
+          {Object.keys(data.history).map((key) => {
+            let tierCollected = 0;
+            Object.keys(data.history[key].cards).map((c) => {
+              tierCollected += data.history[key].cards[c].counter;
+            });
+            return (
+              <TrackerContainer key={`tracker-${key}`}>
+                <TierImage
+                  src={data.history[key].image}
+                  alt={data.history[key].title}
+                />
+                <TrackerText>{tierCollected}</TrackerText>
+              </TrackerContainer>
+            );
+          })}
         </SidebarWrap>
       </SidebarNav>
     </>
