@@ -1,5 +1,5 @@
 import tw from "twin.macro";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Header from "./Header";
 import ApexCharizardLogo from "../../images/genetic-apex-charizard-logo.png";
@@ -131,11 +131,18 @@ const ResizableContainer = styled.div`
 
 const Resizer = styled.div`
   width: 10px;
-  margin-right: 5px;
+  margin-right: 2px;
   cursor: ew-resize;
   background-color: #ccc;
   height: 100%;
   flex-shrink: 0;
+  background: linear-gradient(135deg, #e0e0e0 25%, #c1c1c1 50%, #e0e0e0 75%);
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.2);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  :hover {
+    background: linear-gradient(135deg, #d1d1d1 25%, #b0b0b0 50%, #d1d1d1 75%);
+    box-shadow: 1px 0 6px rgba(0, 0, 0, 0.3); /* Enhanced shadow effect on hover */
+  }
 `;
 
 const TrackerText = tw.div`text-xl font-bold p-2`;
