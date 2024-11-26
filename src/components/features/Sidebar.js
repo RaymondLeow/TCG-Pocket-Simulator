@@ -6,12 +6,12 @@ import ApexCharizardLogo from "../../images/genetic-apex-charizard-logo.png";
 import ApexMewtwoLogo from "../../images/genetic-apex-mewtwo-logo.png";
 import ApexPikachuLogo from "../../images/genetic-apex-pikachu-logo.png";
 import { useData } from "../context/DataContext";
+import { getPackType } from "./Calculator";
 
 const Nav = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   position: relative;
 `;
 
@@ -27,15 +27,21 @@ const SidebarNav = styled.nav`
   background: #fff;
   height: 100vh;
   display: flex;
+  overflow-y: auto;
   justify-content: center;
-  width: 200px;
+  width: ${({ left }) => {
+    if (left) {
+      return "200px";
+    }
+    return "300px";
+  }};
   position: fixed;
   top: 0;
   left: ${({ sidebar, left }) => {
     if (left) {
       return sidebar ? "0" : "-100%";
     }
-    return sidebar ? "calc(100vw - 200px)" : "100%";
+    return sidebar ? "calc(100vw - 300px)" : "100%";
   }};
   transition: 250ms;
   z-index: 10;
@@ -97,6 +103,32 @@ const Separator = styled.div`
   margin-top: 2rem;
 `;
 
+export const FlexGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap; /* Allows items to wrap to the next row */
+  gap: 3px; /* Adds space between items */
+  align-items: center;
+`;
+
+export const FlexItem = styled.div`
+  flex: 1 1 calc(33% - 12px); /* Adjust width for 4 items per row with spacing */
+  box-sizing: border-box; /* Ensures padding and borders are included in width/height */
+  max-width: calc(33% - 4px);
+  padding: 4px;
+  margin: ${(props) => (props.collected ? "1px" : "2px")};
+  min-height: 63px;
+  border-radius: 10px;
+  text-align: center; /* Example text alignment */
+  color: ${(props) => (props.collected ? "auto" : "gray")};
+  border: ${(props) =>
+    props.collected ? "4px solid green" : "2px solid gray"};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 1rem;
+`;
+
 const TrackerText = tw.div`text-xl font-bold p-2`;
 
 const NavButton = tw.button`text-4xl font-bold`;
@@ -109,8 +141,19 @@ const ImageButton = ({ imageSrc, packData, alt, onButtonClick }) => {
   return <ImageButtonImage src={imageSrc} alt={alt} onClick={handleClick} />;
 };
 
+const concatPack = (pack1, pack2) => {
+  let result = {};
+  Object.keys(pack1).forEach((tier) => {
+    result[tier] = pack1[tier].concat(pack2[tier]);
+  });
+  return result;
+};
+
 const Sidebar = ({ onButtonClick }) => {
   const { data } = useData();
+  const [pack, setPack] = useState(
+    concatPack(getPackType("mewtwo"), getPackType("all"))
+  );
 
   const [leftSidebar, setLeftSidebar] = useState(false);
   const [rightSidebar, setRightbar] = useState(false);
@@ -120,6 +163,7 @@ const Sidebar = ({ onButtonClick }) => {
 
   const handleButtonClick = (packData) => {
     onButtonClick(packData);
+    setPack(concatPack(getPackType(packData), getPackType("all")));
   };
 
   return (
@@ -186,17 +230,38 @@ const Sidebar = ({ onButtonClick }) => {
           <Separator />
           {Object.keys(data.history).map((key) => {
             let tierCollected = 0;
-            Object.keys(data.history[key].cards).map((c) => {
+            Object.keys(data.history[key].cards).forEach((c) => {
               tierCollected += data.history[key].cards[c].counter;
             });
             return (
-              <TrackerContainer key={`tracker-${key}`}>
-                <TierImage
-                  src={data.history[key].image}
-                  alt={data.history[key].title}
-                />
-                <TrackerText>{tierCollected}</TrackerText>
-              </TrackerContainer>
+              <>
+                <TrackerContainer key={`tracker-${key}`}>
+                  <TierImage
+                    src={data.history[key].image}
+                    alt={data.history[key].title}
+                  />
+                  <TrackerText>{tierCollected}</TrackerText>
+                </TrackerContainer>
+                <FlexGrid>
+                  {pack[key].map((card, index) => {
+                    const collectedCard = data.history[key].cards[card.id];
+                    return (
+                      <FlexItem
+                        key={`tracker-${card.id}`}
+                        collected={collectedCard !== undefined}
+                      >
+                        {collectedCard !== undefined && (
+                          <p>
+                            <strong>x{collectedCard.counter}</strong>
+                          </p>
+                        )}
+                        <p>{card.name}</p>
+                      </FlexItem>
+                    );
+                  })}
+                </FlexGrid>
+                <Separator />
+              </>
             );
           })}
         </SidebarWrap>

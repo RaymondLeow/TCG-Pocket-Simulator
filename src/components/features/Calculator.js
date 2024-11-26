@@ -38,7 +38,7 @@ function getTier(probabilities) {
   }
 }
 
-function getPackType(packData) {
+export function getPackType(packData) {
   switch (packData) {
     case "mewtwo":
       return mewtwoPack;
