@@ -16,22 +16,22 @@ export const TrackerData = {
       collected: 0,
     },
     mewtwo: {
-      title: "Mewtwo",
+      title: "Genetic Apex (Mewtwo)",
       maxUnique: 80,
       collected: 0,
     },
     charizard: {
-      title: "Charizard",
+      title: "Genetic Apex (Charizard)",
       maxUnique: 79,
       collected: 0,
     },
     pikachu: {
-      title: "Pikachu",
+      title: "Genetic Apex (Pikachu)",
       maxUnique: 80,
       collected: 0,
     },
     all: {
-      title: "All",
+      title: "Genetic Apex (All)",
       maxUnique: 46,
       collected: 0,
     },

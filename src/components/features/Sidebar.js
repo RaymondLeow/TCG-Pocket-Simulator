@@ -93,7 +93,7 @@ const SidebarClose = styled.button`
 
 const TrackerContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
 `;
 
 const Separator = styled.div`
@@ -104,13 +104,20 @@ export const FlexGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
+`;
+
+export const InfoGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const FlexItem = styled.div`
   width: 95px;
   box-sizing: border-box;
-  margin: ${(props) => (props.collected ? "6px" : "6px")};
+  margin: 6px;
   min-height: 63px;
   border-radius: 10px;
   text-align: center;
@@ -122,6 +129,21 @@ export const FlexItem = styled.div`
   align-items: center;
   flex-direction: column;
   font-size: 0.9rem;
+`;
+
+export const InfoItem = styled.div`
+  flex: 1 1 95px;
+  max-width: 95px;
+  box-sizing: border-box;
+  margin: 6px;
+  border-radius: 10px;
+  text-align: center;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  font-size: 0.9rem;
+  height: 73px;
 `;
 
 const ResizableContainer = styled.div`
@@ -146,6 +168,8 @@ const Resizer = styled.div`
 `;
 
 const TrackerText = tw.div`text-xl font-bold p-2`;
+const DataText = tw.div`text-2xl font-bold`;
+const InfoText = tw.div`text-xs`;
 
 const NavButton = tw.button`text-2xl sm:text-4xl font-bold`;
 
@@ -243,22 +267,24 @@ const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
                 ⧗
               </SidebarClose>
             </SidebarButtonContainer>
-            <TrackerContainer>
-              <TrackerText>Opened</TrackerText>
-              <TrackerText>{data.packsOpened}</TrackerText>
-            </TrackerContainer>
-            <Separator />
-            {Object.keys(data.uniqueTracker).map((key) => {
-              return (
-                <TrackerContainer key={`tracker-${key}`}>
-                  <TrackerText>{data.uniqueTracker[key].title}</TrackerText>
-                  <TrackerText>
-                    {data.uniqueTracker[key].collected} /{" "}
-                    {data.uniqueTracker[key].maxUnique}
-                  </TrackerText>
-                </TrackerContainer>
-              );
-            })}
+            {/* <Separator /> */}
+            <InfoGrid>
+              <InfoItem>
+                <DataText>{data.packsOpened}</DataText>
+                <InfoText>Opened</InfoText>
+              </InfoItem>
+              {Object.keys(data.uniqueTracker).map((key) => {
+                return (
+                  <InfoItem key={`tracker-${key}`}>
+                    <DataText>
+                      {data.uniqueTracker[key].collected}/
+                      {data.uniqueTracker[key].maxUnique}
+                    </DataText>
+                    <InfoText>{data.uniqueTracker[key].title}</InfoText>
+                  </InfoItem>
+                );
+              })}
+            </InfoGrid>
             <Separator />
             {Object.keys(data.history).map((key) => {
               let tierCollected = 0;
@@ -268,11 +294,11 @@ const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
               return (
                 <>
                   <TrackerContainer key={`tracker-${key}`}>
+                    {/* <TrackerText>{tierCollected}</TrackerText> */}
                     <TierImage
                       src={data.history[key].image}
                       alt={data.history[key].title}
                     />
-                    <TrackerText>{tierCollected}</TrackerText>
                   </TrackerContainer>
                   <FlexGrid>
                     {pack[key].map((card, index) => {
