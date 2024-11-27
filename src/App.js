@@ -10,8 +10,8 @@ import { DataProvider } from "components/context/DataContext.js";
 
 const Container = styled.div`
   width: 100vw; 
-  overflow: hidden 
-  display: flex 
+  overflow: hidden; 
+  display: flex,
   height: 100vh;  
 `;
 

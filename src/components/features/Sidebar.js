@@ -13,10 +13,11 @@ const Nav = styled.div`
   align-items: center;
   justify-content: space-between;
   position: relative;
+  width: 100%;
 `;
 
 const NavIcon = styled.div`
-  flex: 0 0 auto;
+  flex: 1;
   padding: 10px 20px;
   font-size: 16px;
 `;
@@ -43,10 +44,7 @@ const SidebarNav = styled.nav`
 `;
 
 const CenterContainer = styled.div`
-  flex: 1 1 auto;
-  display: flex;
-  justify-content: flex;
-  width: 400px;
+  flex: 1 1 100%;
 `;
 
 const SidebarWrap = styled.div`

@@ -1,8 +1,17 @@
-import tw from "twin.macro";
 import HeaderImage from "../../images/title-logo.png";
+import styled from "styled-components";
 
-const Image = tw.img`max-w-[300px] h-auto`;
-const HeaderContainer = tw.header`flex justify-center items-center w-full`;
+const Image = styled.img`
+  max-height: 100px;
+`;
+
+const HeaderContainer = styled.header`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+`;
 
 export const Header = () => {
   return (

@@ -156,6 +156,9 @@ const Packs = ({ packData }) => {
     handleMouseLeave(rotateX, rotateY, x, y, shadowX, shadowY);
   };
 
+  const cardWidth = 367;
+  const cardHeight = 512;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -165,7 +168,7 @@ const Packs = ({ packData }) => {
       }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
       style={{
-        width: "100vw",
+        width: "calc(100vw - 50px)",
         height: "calc(100vh - 109px)",
         display: "flex",
         placeContent: "center",
@@ -175,8 +178,9 @@ const Packs = ({ packData }) => {
     >
       <motion.div
         style={{
-          width: 367,
-          height: 512,
+          maxWidth: cardWidth,
+          width: "calc(100% - 20px)",
+          height: cardHeight,
           position: "relative",
         }}
       >
@@ -188,6 +192,7 @@ const Packs = ({ packData }) => {
                 <motion.div
                   key={`stack-${stackCounter}-card-${card}`}
                   style={{
+                    maxWidth: cardWidth,
                     width: 367,
                     height: 512,
                     position: "absolute",
