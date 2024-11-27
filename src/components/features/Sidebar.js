@@ -57,13 +57,21 @@ const ImageButtonImage = styled.img`
   padding: 1rem;
   cursor: pointer;
   transition: transform 0.3s ease, opacity 0.3s ease;
-
-  &:hover {
-    transform: scale(1.05) translateY(-5px);
-  }
+  background: ${({ selected }) => {
+    return selected ? "rgba(0, 0, 0, 0.2)" : "none";
+  }};
+  box-shadow: ${({ selected }) => {
+    return selected
+      ? "inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)"
+      : "none";
+  }};
+  border-radius: 8px;
+  margin: 5px;
 
   &:active {
-    transform: translateY(5px);
+    background: #d0d0d0;
+    transform: translateY(3px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 `;
 
@@ -147,12 +155,19 @@ const TrackerText = tw.div`text-xl font-bold p-2`;
 
 const NavButton = tw.button`text-4xl font-bold`;
 
-const ImageButton = ({ imageSrc, packData, alt, onButtonClick }) => {
+const ImageButton = ({ imageSrc, packData, alt, onButtonClick, selected }) => {
   const handleClick = () => {
     onButtonClick(packData);
   };
 
-  return <ImageButtonImage src={imageSrc} alt={alt} onClick={handleClick} />;
+  return (
+    <ImageButtonImage
+      src={imageSrc}
+      alt={alt}
+      selected={selected}
+      onClick={handleClick}
+    />
+  );
 };
 
 const concatPack = (pack1, pack2) => {
@@ -170,6 +185,7 @@ const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
   const [pack, setPack] = useState(
     concatPack(getPackType("mewtwo"), getPackType("all"))
   );
+  const [packData, setPackData] = useState("mewtwo");
 
   const [leftSidebar, setLeftSidebar] = useState(false);
   const [rightSidebar, setRightbar] = useState(false);
@@ -179,6 +195,7 @@ const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
 
   const handleButtonClick = (packData) => {
     onButtonClick(packData);
+    setPackData(packData);
     setPack(concatPack(getPackType(packData), getPackType("all")));
   };
 
@@ -204,18 +221,21 @@ const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
             imageSrc={ApexMewtwoLogo}
             alt="Open Genetic Apex Mewtwo Pack"
             packData="mewtwo"
+            selected={packData === "mewtwo"}
             onButtonClick={() => handleButtonClick("mewtwo")}
           />
           <ImageButton
             imageSrc={ApexPikachuLogo}
             alt="Open Genetic Apex Pikachu Pack"
             packData="pikachu"
+            selected={packData === "pikachu"}
             onButtonClick={() => handleButtonClick("pikachu")}
           />
           <ImageButton
             imageSrc={ApexCharizardLogo}
             alt="Open Genetic Apex Charizard Pack"
             packData="charizard"
+            selected={packData === "charizard"}
             onButtonClick={() => handleButtonClick("charizard")}
           />
         </SidebarWrap>
