@@ -89,12 +89,6 @@ const SidebarClose = styled.button`
   padding: 1rem;
   font-size: 2.25rem;
   font-weight: bold;
-  float: ${({ left }) => {
-    if (left) {
-      return "left";
-    }
-    return "right";
-  }};
 `;
 
 const TrackerContainer = styled.div`
@@ -153,7 +147,7 @@ const Resizer = styled.div`
 
 const TrackerText = tw.div`text-xl font-bold p-2`;
 
-const NavButton = tw.button`text-4xl font-bold`;
+const NavButton = tw.button`text-2xl sm:text-4xl font-bold`;
 
 const ImageButton = ({ imageSrc, packData, alt, onButtonClick, selected }) => {
   const handleClick = () => {

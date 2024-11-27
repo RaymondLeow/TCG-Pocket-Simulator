@@ -12,6 +12,75 @@ import {
   handleMouseMove,
 } from "utils/MouseEvents";
 import { useData } from "components/context/DataContext";
+import styled from "styled-components";
+
+const CardContainer = styled.div`
+  height: 100%;
+  width: 100%;
+  position: relative;
+`;
+
+const NewIndicator = styled(motion.div)`
+  position: absolute;
+  top: -40px;
+  background: red;
+  width: 60px;
+  color: white;
+  height: 30px;
+  z-index: 20;
+  align-items: center;
+  background: linear-gradient(145deg, #ff7598, #b91f5a);
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+const cardWidth = 367;
+const cardHeight = 512;
+
+const GlitterEffect = styled.div`
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 80px;
+  height: 50px;
+  border-radius: 50px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 0, 0.4),
+    rgba(255, 223, 0, 0)
+  );
+  z-index: 0;
+  pointer-events: none;
+`;
+
+// const Snake = styled(motion.div)`
+//   width: 8px;
+//   height: 8px;
+//   background-color: yellow;
+//   border-radius: 50%;
+//   position: absolute;
+// `;
+
+// Animation variants for the Pill
+const pillVariants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.5, // Start from a smaller size
+  },
+  visible: {
+    opacity: 1,
+    scale: 1, // Animate to full size
+    transition: {
+      type: "spring",
+      stiffness: 250,
+      damping: 25, // For a bouncy effect when it grows
+    },
+  },
+};
 
 const preloadImage = (src) => {
   return new Promise((resolve, reject) => {
@@ -23,7 +92,7 @@ const preloadImage = (src) => {
 };
 
 const Packs = ({ packData }) => {
-  const { setData } = useData();
+  const { data, setData } = useData();
 
   // State to manage the stack and card animations
   const [cards, setCards] = useState([0, 1, 2, 3, 4]); // Initialize with 5 cards
@@ -96,7 +165,7 @@ const Packs = ({ packData }) => {
   const rotateY = useSpring(0, springValue);
   const x = useSpring(0, { stiffness: 400, damping: 30 });
   const y = useSpring(0, { stiffness: 400, damping: 30 });
-  const filter = useMotionTemplate`drop-shadow(${shadowX}px ${shadowY}px 20px rgba(0, 0, 68, 0.4))`;
+  const filter = useMotionTemplate`drop-shadow(${shadowX}px ${shadowY}px 5px rgba(0, 0, 68, 0.4))`;
 
   // Click handler to swipe card left
   const handleCardClick = () => {
@@ -156,8 +225,32 @@ const Packs = ({ packData }) => {
     handleMouseLeave(rotateX, rotateY, x, y, shadowX, shadowY);
   };
 
-  const cardWidth = 367;
-  const cardHeight = 512;
+  const glitterEffectVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: [0.4, 1, 0.4],
+      transition: { duration: 1, repeat: Infinity, repeatType: "reverse" },
+    },
+  };
+
+  // const snakeVariants = {
+  //   moving: {
+  //     x: [-4, cardWidth - 4, cardWidth - 4, -4, -4], // Moves on x-axis
+  //     y: [-4, 4, cardHeight - 4, cardHeight - 4, -4], // Moves on y-axis
+  //     transition: {
+  //       x: { repeat: Infinity, duration: 4, ease: "linear" },
+  //       y: { repeat: Infinity, duration: 4, ease: "linear" },
+  //     },
+  //   },
+  // };
+
+  let isNew = false;
+  if (imageSet.length > 0) {
+    const cardKey = cards[0];
+    const { id, tier } = imageSet[cardKey];
+    isNew = !data.history[tier].cards[id];
+  }
+  // console.log();
 
   return (
     <motion.div
@@ -168,7 +261,9 @@ const Packs = ({ packData }) => {
       }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
       style={{
-        width: "calc(100vw - 50px)",
+        width: "100%",
+        paddingLeft: 20,
+        paddingRight: 20,
         height: "calc(100vh - 109px)",
         display: "flex",
         placeContent: "center",
@@ -179,54 +274,110 @@ const Packs = ({ packData }) => {
       <motion.div
         style={{
           maxWidth: cardWidth,
-          width: "calc(100% - 20px)",
+          width: "calc(100% - 70px)",
           height: cardHeight,
           position: "relative",
         }}
       >
-        <AnimatePresence>
-          {!newStackVisible &&
-            imageSet.length > 0 &&
-            cards.map((card, index) => {
-              return (
-                <motion.div
-                  key={`stack-${stackCounter}-card-${card}`}
-                  style={{
-                    maxWidth: cardWidth,
-                    width: 367,
-                    height: 512,
-                    position: "absolute",
-                    // top: `${(index - 4) * -15}px`, // Slightly offset each card
-                    top: `${(cards.length - index - 1) * 10}px`, // Slight offset for each card
-                    left: `${(index / cards.length) * 30}px`,
-                    cursor: "pointer",
-                    zIndex: cards.length - index, // Ensure the top card is always on top
-                    rotateX: rotateX,
-                    rotateY: rotateY,
-                    filter,
-                    backgroundImage: `url(${imageSet[card].image})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
-                    borderRadius: 10,
-                    boxShadow: "0 10px 20px rgba(0, 0, 0, 0.15)",
-                    imageRendering: "high-quality",
-                  }}
-                  onMouseEnter={onMouseEnter}
-                  onMouseMove={onMouseMove}
-                  onMouseLeave={onMouseLeave}
-                  onClick={handleCardClick}
-                  exit={{
-                    // opacity: 0,
-                    x: -2000, // Smoothly swipe out left
+        <CardContainer>
+          <AnimatePresence>
+            {!newStackVisible &&
+              imageSet.length > 0 &&
+              cards.map((card, index) => {
+                return (
+                  <motion.div
+                    key={`stack-${stackCounter}-card-${card}`}
+                    style={{
+                      height: 0,
+                      width: "100%",
+                      paddingTop: "139.509%",
+                      position: "absolute",
+                      top: `${(cards.length - index - 1) * 10}px`,
+                      left: `${(index / cards.length) * 30}px`,
+                      cursor: "pointer",
+                      zIndex: cards.length - index,
+                      rotateX: rotateX,
+                      rotateY: rotateY,
+                      filter,
+                      backgroundImage: `url(${imageSet[card].image})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      backgroundRepeat: "no-repeat",
+                      borderRadius: 10,
+                      boxShadow: "0 10px 20px rgba(0, 0, 0, 0.15)",
+                      imageRendering: "high-quality",
+                    }}
+                    onMouseEnter={onMouseEnter}
+                    onMouseMove={onMouseMove}
+                    onMouseLeave={onMouseLeave}
+                    onClick={handleCardClick}
+                    exit={{
+                      x: -2000,
+                      transition: { duration: 0.2 },
+                    }}
+                  >
+                    {index === 0 && isNew && (
+                      <AnimatePresence>
+                        <motion.div
+                          variants={glitterEffectVariants}
+                          initial="hidden"
+                          animate="visible"
+                          style={{
+                            position: "absolute",
+                            top: "-40px",
+                          }}
+                        >
+                          <GlitterEffect />
+                        </motion.div>
+                        <NewIndicator
+                          initial={{ scale: 0, y: 5 }}
+                          animate={{ scale: 1, y: 0 }}
+                          exit={{ scale: 0, transition: { duration: 0.2 } }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 1000,
+                            damping: 50,
+                            duration: 0.2,
+                          }}
+                        >
+                          NEW
+                        </NewIndicator>
+                        {/* <Snake
+                          variants={snakeVariants}
+                          initial={{ x: -4, y: -4 }}
+                          animate="moving"
+                        /> */}
 
-                    // y: 1000, // Slide the card upwards when clicked
-                    transition: { duration: 0.2 },
-                  }}
-                />
-              );
-            })}
-        </AnimatePresence>
+                        {/* Snake 1: Tail (delayed animation) */}
+                        {/* <Snake
+                          variants={snakeVariants}
+                          initial={{ x: -4, y: -4 }}
+                          animate="moving"
+                          transition={{
+                            x: {
+                              repeat: Infinity,
+                              duration: 4,
+                              ease: "linear",
+                              delay: 1,
+                            }, // Delay to follow the head
+                            y: {
+                              repeat: Infinity,
+                              duration: 4,
+                              ease: "linear",
+                              delay: 1,
+                            },
+                          }}
+                          style={{
+                            backgroundColor: "yellow", // Tail has a different color to distinguish it from the head
+                          }}
+                        /> */}
+                      </AnimatePresence>
+                    )}
+                  </motion.div>
+                );
+              })}
+          </AnimatePresence>
+        </CardContainer>
         {/* New stack (appears from below) */}
         {newStackVisible && (
           <motion.div
@@ -236,8 +387,8 @@ const Packs = ({ packData }) => {
             style={{
               position: "absolute",
               bottom: 0,
-              transform: "translateX(-50%)",
-              width: 367,
+              // transform: "translateX(-50%)",
+              width: "100%",
               height: 512,
               // backgroundImage: `url(${imageSet[0]})`,
               backgroundSize: "cover",
@@ -251,8 +402,9 @@ const Packs = ({ packData }) => {
                 key={index}
                 style={{
                   filter,
-                  width: 367,
-                  height: 512,
+                  height: 0,
+                  width: "100%",
+                  paddingTop: "139.509%",
                   position: "absolute",
                   top: `${(cards.length - index - 1) * 10}px`, // Slight offset for each card
                   left: `${(index / cards.length) * 30}px`,
