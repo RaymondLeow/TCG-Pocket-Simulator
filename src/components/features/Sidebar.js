@@ -17,8 +17,9 @@ const Nav = styled.div`
 `;
 
 const NavIcon = styled.div`
-  flex: 1;
-  padding: 10px 20px;
+  flex: 1 1 80px;
+  // padding: 10px 20px;
+  width: 80px;
   font-size: 16px;
 `;
 
@@ -45,26 +46,26 @@ const SidebarNav = styled.nav`
 
 const CenterContainer = styled.div`
   flex: 1 1 100%;
+  margin-left: 80px;
+  margin-right: 80px;
 `;
 
 const SidebarWrap = styled.div`
   width: 100%;
   height: 100%;
   overflow-y: auto;
+  padding-top: 80px;
 `;
 
 const ImageButtonImage = styled.img`
   padding: 1rem;
   cursor: pointer;
   transition: transform 0.3s ease, opacity 0.3s ease;
-  background: ${({ selected }) => {
-    return selected ? "rgba(0, 0, 0, 0.2)" : "none";
-  }};
-  box-shadow: ${({ selected }) => {
-    return selected
+  background: ${({ selected }) => (selected ? "rgba(0, 0, 0, 0.2)" : "none")};
+  box-shadow: ${({ selected }) =>
+    selected
       ? "inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)"
-      : "none";
-  }};
+      : "none"};
   border-radius: 8px;
   margin: 5px;
 
@@ -80,15 +81,43 @@ const TierImage = styled.img`
   height: 25px;
 `;
 
+// const SidebarButtonContainer = styled.div`
+//   display: flex;
+//   justify-content: flex-end;
+// `;
+
+// const SidebarClose = styled.button`
+//   padding: 1rem;
+//   font-size: 2.25rem;
+//   font-weight: bold;
+// `;
+
 const SidebarButtonContainer = styled.div`
-  display: flex;
-  justify-content: flex-end;
+  position: fixed;
+  right: ${({ left }) => (left ? "auto" : "20px")};
+  left: ${({ left }) => (left ? "10px" : "auto")};
+  top: 10px;
 `;
 
 const SidebarClose = styled.button`
-  padding: 1rem;
+  height: 60px;
+  width: 60px;
+  background-color: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  border: none;
+  justify-content: flex-end;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+
+  :hover {
+    background-color: #eee;
+    transform: scale(1.1);
+  }
   font-size: 2.25rem;
   font-weight: bold;
+  display: flex;
+  justify-content: center;
 `;
 
 const TrackerContainer = styled.div`
@@ -136,6 +165,7 @@ export const InfoItem = styled.div`
   max-width: 95px;
   box-sizing: border-box;
   margin: 6px;
+  margin-bottom: 10px;
   border-radius: 10px;
   text-align: center;
   display: flex;
@@ -220,21 +250,23 @@ const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
   return (
     <>
       <Nav>
-        <NavIcon to="#">
-          <NavButton onClick={showLeftSidebar}>☰</NavButton>
-        </NavIcon>
+        {/* <NavIcon to="#"> */}
+        {/* <NavButton onClick={showLeftSidebar}>☰</NavButton> */}
+        {/* </NavIcon> */}
         <CenterContainer>
           <Header />
         </CenterContainer>
-        <NavIcon to="#">
-          <NavButton onClick={showRightSidebar}>⧗</NavButton>
-        </NavIcon>
+        {/* <NavIcon to="#"> */}
+        {/*<NavButton onClick={showRightSidebar}>⧗</NavButton>*/}
+        {/* </NavIcon> */}
       </Nav>
       <SidebarNav sidebar={leftSidebar} left={true} width={leftWidth}>
         <SidebarWrap>
-          <SidebarClose onClick={showLeftSidebar} left={true}>
-            ☰
-          </SidebarClose>
+          <SidebarButtonContainer left={true}>
+            <SidebarClose onClick={showLeftSidebar} left={true}>
+              ☰
+            </SidebarClose>
+          </SidebarButtonContainer>
           <ImageButton
             imageSrc={ApexMewtwoLogo}
             alt="Open Genetic Apex Mewtwo Pack"
@@ -262,12 +294,11 @@ const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
         <SidebarNav sidebar={rightSidebar} left={false} width={sidebarWidth}>
           <Resizer onMouseDown={onMouseDown} />
           <SidebarWrap>
-            <SidebarButtonContainer>
+            <SidebarButtonContainer left={false}>
               <SidebarClose onClick={showRightSidebar} left={false}>
                 ⧗
               </SidebarClose>
             </SidebarButtonContainer>
-            {/* <Separator /> */}
             <InfoGrid>
               <InfoItem>
                 <DataText>{data.packsOpened}</DataText>
