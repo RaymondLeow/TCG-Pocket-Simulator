@@ -126,16 +126,15 @@ const Packs = ({ packData }) => {
       isFirstRender.current = false; // Skip first render
       return;
     }
+    setNewStackVisible(true);
     setCards([0, 1, 2, 3, 4]); // Reset the stack
     setImageLoaded(false); // Reset image loaded state for new stack
 
     fetchNewStack(); // Fetch new images for the next stack
 
-    setNewStackVisible(true);
-
     setTimeout(() => {
       setNewStackVisible(false); // Hide the new stack after animation
-    }, 500); // Duration of the animation for sliding up
+    }, 50); // Duration of the animation for sliding up
   }, [packData]);
 
   // Function to preload all images for the stack
@@ -180,7 +179,7 @@ const Packs = ({ packData }) => {
 
       setTimeout(() => {
         setNewStackVisible(false); // Hide the new stack after animation
-      }, 500); // Duration of the animation for sliding up
+      }, 400); // Duration of the animation for sliding up
     } else {
       // Swipe the top card to the left (or another swipe action)
       setCards((prev) => prev.slice(1));
@@ -383,7 +382,12 @@ const Packs = ({ packData }) => {
           <motion.div
             initial={{ y: 1000 }}
             animate={{ y: 0 }}
-            transition={{ type: "spring", stiffness: 200, damping: 30 }}
+            transition={{
+              type: "spring",
+              stiffness: 500,
+              damping: 50,
+              duration: 0.1,
+            }}
             style={{
               position: "absolute",
               bottom: 0,
@@ -416,7 +420,6 @@ const Packs = ({ packData }) => {
                   borderRadius: 10,
                   boxShadow: "0 10px 20px rgba(0, 0, 0, 0.15)",
                 }}
-                onClick={handleCardClick}
               />
             ))}
           </motion.div>

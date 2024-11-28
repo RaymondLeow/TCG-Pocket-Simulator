@@ -103,7 +103,7 @@ const SidebarClose = styled.button`
   height: 60px;
   width: 60px;
   background-color: #fff;
-  border-radius: 50%;
+  border-radius: 8px;
   cursor: pointer;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   border: none;
@@ -114,6 +114,12 @@ const SidebarClose = styled.button`
     background-color: #eee;
     transform: scale(1.1);
   }
+
+  :active {
+    background-color: #eee;
+    transform: scale(0.9);
+  }
+
   font-size: 2.25rem;
   font-weight: bold;
   display: flex;
