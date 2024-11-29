@@ -57,31 +57,6 @@ const GlitterEffect = styled.div`
   pointer-events: none;
 `;
 
-// const Snake = styled(motion.div)`
-//   width: 8px;
-//   height: 8px;
-//   background-color: yellow;
-//   border-radius: 50%;
-//   position: absolute;
-// `;
-
-// Animation variants for the Pill
-const pillVariants = {
-  hidden: {
-    opacity: 0,
-    scale: 0.5, // Start from a smaller size
-  },
-  visible: {
-    opacity: 1,
-    scale: 1, // Animate to full size
-    transition: {
-      type: "spring",
-      stiffness: 250,
-      damping: 25, // For a bouncy effect when it grows
-    },
-  },
-};
-
 const preloadImage = (src) => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -134,7 +109,7 @@ const Packs = ({ packData }) => {
 
     setTimeout(() => {
       setNewStackVisible(false); // Hide the new stack after animation
-    }, 50); // Duration of the animation for sliding up
+    }, 400); // Duration of the animation for sliding up
   }, [packData]);
 
   // Function to preload all images for the stack
@@ -232,24 +207,12 @@ const Packs = ({ packData }) => {
     },
   };
 
-  // const snakeVariants = {
-  //   moving: {
-  //     x: [-4, cardWidth - 4, cardWidth - 4, -4, -4], // Moves on x-axis
-  //     y: [-4, 4, cardHeight - 4, cardHeight - 4, -4], // Moves on y-axis
-  //     transition: {
-  //       x: { repeat: Infinity, duration: 4, ease: "linear" },
-  //       y: { repeat: Infinity, duration: 4, ease: "linear" },
-  //     },
-  //   },
-  // };
-
   let isNew = false;
   if (imageSet.length > 0) {
     const cardKey = cards[0];
     const { id, tier } = imageSet[cardKey];
     isNew = !data.history[tier].cards[id];
   }
-  // console.log();
 
   return (
     <motion.div
@@ -334,42 +297,13 @@ const Packs = ({ packData }) => {
                           exit={{ scale: 0, transition: { duration: 0.2 } }}
                           transition={{
                             type: "spring",
-                            stiffness: 1000,
+                            stiffness: 500,
                             damping: 50,
-                            duration: 0.2,
+                            duration: 0.1,
                           }}
                         >
                           NEW
                         </NewIndicator>
-                        {/* <Snake
-                          variants={snakeVariants}
-                          initial={{ x: -4, y: -4 }}
-                          animate="moving"
-                        /> */}
-
-                        {/* Snake 1: Tail (delayed animation) */}
-                        {/* <Snake
-                          variants={snakeVariants}
-                          initial={{ x: -4, y: -4 }}
-                          animate="moving"
-                          transition={{
-                            x: {
-                              repeat: Infinity,
-                              duration: 4,
-                              ease: "linear",
-                              delay: 1,
-                            }, // Delay to follow the head
-                            y: {
-                              repeat: Infinity,
-                              duration: 4,
-                              ease: "linear",
-                              delay: 1,
-                            },
-                          }}
-                          style={{
-                            backgroundColor: "yellow", // Tail has a different color to distinguish it from the head
-                          }}
-                        /> */}
                       </AnimatePresence>
                     )}
                   </motion.div>
@@ -391,10 +325,8 @@ const Packs = ({ packData }) => {
             style={{
               position: "absolute",
               bottom: 0,
-              // transform: "translateX(-50%)",
               width: "100%",
               height: 512,
-              // backgroundImage: `url(${imageSet[0]})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               borderRadius: 10,

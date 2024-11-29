@@ -80,18 +80,25 @@ export const TrackerData = {
   },
 };
 
+export function loadTrackerData(trackerData, loadedData) {
+  for (const [key, value] of Object.entries(loadedData)) {
+    const { tier, packType, counter } = value;
+    updateTrackerData(trackerData, { id: key, tier, packType, counter });
+  }
+}
+
 export function updateTrackerData(trackerData, newData) {
   if (Number.isInteger(newData)) {
     trackerData.packsOpened = newData + 1;
     return trackerData;
   }
 
-  const { id, tier, packType } = newData;
+  const { id, tier, packType, counter = 1 } = newData;
 
   if (!trackerData.history[tier].cards[id]) {
-    trackerData.uniqueTracker.total.collected += 1;
-    trackerData.uniqueTracker[packType].collected += 1;
-    newData.counter = 1;
+    trackerData.uniqueTracker.total.collected += counter;
+    trackerData.uniqueTracker[packType].collected += counter;
+    newData.counter = counter;
     trackerData.history[tier].cards[id] = newData;
   } else {
     trackerData.history[tier].cards[id].counter += 1;
