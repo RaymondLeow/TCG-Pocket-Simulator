@@ -65,16 +65,27 @@ const preloadImage = (src) => {
     img.onerror = (err) => reject(err);
   });
 };
+const getShineEffect = (rotateX, rotateY) => {
+  const xVal = rotateX.get();
+  const yVal = rotateY.get();
+
+  const gradientX = (xVal / 100) * 150;
+  const gradientY = (yVal / 100) * 150;
+
+  return `radial-gradient(circle at ${50 + gradientY}% ${
+    50 - gradientX
+  }%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 80%)`;
+};
 
 const Packs = ({ packData }) => {
   const { data, setData, incrementStackCounter } = useData();
-
-  // State to manage the stack and card animations
-  const [cards, setCards] = useState([0, 1, 2, 3, 4]); // Initialize with 5 cards
-  const [imageSet, setImageSet] = useState([]); // Initialize with an empty image set
+  const [cards, setCards] = useState([0, 1, 2, 3, 4]);
+  const [imageSet, setImageSet] = useState([]);
   const [newStackVisible, setNewStackVisible] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [stackCounter, setStackCounter] = useState(0);
+  const [shineEffect, setShineEffect] = useState("");
+  const [isHovered, setIsHovered] = useState(false);
 
   // State for hover effect
   const [frame, setFrame] = useState({
@@ -143,6 +154,30 @@ const Packs = ({ packData }) => {
   const y = useSpring(0, { stiffness: 400, damping: 30 });
   const filter = useMotionTemplate`drop-shadow(${shadowX}px ${shadowY}px 5px rgba(0, 0, 68, 0.4))`;
 
+  useEffect(() => {
+    // Update the shine effect whenever the rotation values change
+    const updateShineEffect = () => {
+      const currentRotateX = rotateX;
+      const currentRotateY = rotateY;
+
+      const shineEffect = getShineEffect(currentRotateX, currentRotateY);
+      setShineEffect(shineEffect);
+    };
+
+    // Subscribe to changes in rotateX and rotateY
+    const unsubscribeX = rotateX.onChange(updateShineEffect);
+    const unsubscribeY = rotateY.onChange(updateShineEffect);
+
+    // Initial update
+    updateShineEffect();
+
+    // Cleanup listeners
+    return () => {
+      unsubscribeX();
+      unsubscribeY();
+    };
+  }, [rotateX, rotateY]);
+
   // Click handler to swipe card left
   const handleCardClick = () => {
     if (cards.length === 1) {
@@ -165,6 +200,7 @@ const Packs = ({ packData }) => {
   };
 
   const onMouseEnter = (e) => {
+    setIsHovered(true);
     const currentFrame = handleMouseEnter(e, setFrame);
     handleMouseMove(
       {
@@ -198,6 +234,7 @@ const Packs = ({ packData }) => {
   };
 
   const onMouseLeave = () => {
+    setIsHovered(false);
     handleMouseLeave(rotateX, rotateY, x, y, shadowX, shadowY);
   };
 
@@ -262,7 +299,7 @@ const Packs = ({ packData }) => {
                       zIndex: cards.length - index,
                       rotateX: rotateX,
                       rotateY: rotateY,
-                      filter,
+                      filter: filter,
                       backgroundImage: `url(${imageSet[card].image})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
@@ -308,6 +345,25 @@ const Packs = ({ packData }) => {
                           NEW
                         </NewIndicator>
                       </AnimatePresence>
+                    )}
+                    {isHovered && (
+                      <motion.div
+                        key={`shine-${stackCounter}-glitter-${card}`}
+                        style={{
+                          height: 0,
+                          top: 0,
+                          width: "100%",
+                          paddingTop: "139.509%",
+                          position: "absolute",
+                          content: '""',
+                          backgroundImage: shineEffect,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          borderRadius: 10,
+                          pointerEvents: "none",
+                          zIndex: cards.length - index + 1,
+                        }}
+                      />
                     )}
                   </motion.div>
                 );
