@@ -87,6 +87,10 @@ export function loadTrackerData(trackerData, loadedData) {
   }
 }
 
+export function loadMiscellaneousData(trackerData, loadedData) {
+  updateTrackerData(trackerData, loadedData);
+}
+
 export function updateTrackerData(trackerData, newData) {
   if (Number.isInteger(newData)) {
     trackerData.packsOpened = newData + 1;
@@ -109,7 +113,7 @@ export function updateTrackerData(trackerData, newData) {
 export function resetTrackerData(dbName, storeName) {
   const resetDB = async () => {
     try {
-      const db = await openDatabase(dbName, storeName);
+      const db = await openDatabase(dbName, [storeName]);
       await deleteData(db, storeName);
     } catch (error) {
       console.error("Error initializing IndexedDB:", error);
