@@ -16,16 +16,9 @@ const Nav = styled.div`
   width: 100%;
 `;
 
-const NavIcon = styled.div`
-  flex: 1 1 80px;
-  // padding: 10px 20px;
-  width: 80px;
-  font-size: 16px;
-`;
-
 const SidebarNav = styled.nav`
-  border-right: 3px solid #232323;
-  border-left: 3px solid #232323;
+  border-right: ${({ left }) => (left ? `3px solid #232323` : "none")};
+  border-left: ${({ left }) => (left ? "none" : `3px solid #232323`)};
   background: #fff;
   height: 100vh;
   display: flex;
@@ -55,6 +48,9 @@ const SidebarWrap = styled.div`
   height: 100%;
   overflow-y: auto;
   padding-top: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const ImageButtonImage = styled.img`
@@ -80,17 +76,6 @@ const TierImage = styled.img`
   margin: 0.5rem;
   height: 25px;
 `;
-
-// const SidebarButtonContainer = styled.div`
-//   display: flex;
-//   justify-content: flex-end;
-// `;
-
-// const SidebarClose = styled.button`
-//   padding: 1rem;
-//   font-size: 2.25rem;
-//   font-weight: bold;
-// `;
 
 const SidebarButtonContainer = styled.div`
   position: fixed;
@@ -203,11 +188,34 @@ const Resizer = styled.div`
   }
 `;
 
-const TrackerText = tw.div`text-xl font-bold p-2`;
+const ResetButton = styled.button`
+  height: 60px;
+  width: 160px;
+  margin: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  color: red;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+
+  :hover {
+    background-color: #eee;
+    transform: scale(1.1);
+  }
+
+  :active {
+    background-color: #eee;
+    transform: scale(0.9);
+  }
+
+  font-weight: bold;
+  margin-top: auto;
+  text-align: center;
+`;
+
 const DataText = tw.div`text-2xl font-bold`;
 const InfoText = tw.div`text-xs`;
-
-const NavButton = tw.button`text-2xl sm:text-4xl font-bold`;
 
 const ImageButton = ({ imageSrc, packData, alt, onButtonClick, selected }) => {
   const handleClick = () => {
@@ -235,7 +243,7 @@ const concatPack = (pack1, pack2) => {
 const leftWidth = 200;
 
 const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
-  const { data } = useData();
+  const { data, resetData } = useData();
   const [pack, setPack] = useState(
     concatPack(getPackType("mewtwo"), getPackType("all"))
   );
@@ -256,15 +264,9 @@ const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
   return (
     <>
       <Nav>
-        {/* <NavIcon to="#"> */}
-        {/* <NavButton onClick={showLeftSidebar}>☰</NavButton> */}
-        {/* </NavIcon> */}
         <CenterContainer>
           <Header />
         </CenterContainer>
-        {/* <NavIcon to="#"> */}
-        {/*<NavButton onClick={showRightSidebar}>⧗</NavButton>*/}
-        {/* </NavIcon> */}
       </Nav>
       <SidebarNav sidebar={leftSidebar} left={true} width={leftWidth}>
         <SidebarWrap>
@@ -294,6 +296,7 @@ const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
             selected={packData === "charizard"}
             onButtonClick={() => handleButtonClick("charizard")}
           />
+          <ResetButton onClick={resetData}>Clear Save Data</ResetButton>
         </SidebarWrap>
       </SidebarNav>
       <ResizableContainer>
@@ -310,39 +313,35 @@ const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
                 <DataText>{data.packsOpened}</DataText>
                 <InfoText>Opened</InfoText>
               </InfoItem>
-              {Object.keys(data.uniqueTracker).map((key) => {
+              {Object.keys(data.uniqueTracker).map((trackKey) => {
                 return (
-                  <InfoItem key={`tracker-${key}`}>
+                  <InfoItem key={`tracker-${trackKey}`}>
                     <DataText>
-                      {data.uniqueTracker[key].collected}/
-                      {data.uniqueTracker[key].maxUnique}
+                      {data.uniqueTracker[trackKey].collected}/
+                      {data.uniqueTracker[trackKey].maxUnique}
                     </DataText>
-                    <InfoText>{data.uniqueTracker[key].title}</InfoText>
+                    <InfoText>{data.uniqueTracker[trackKey].title}</InfoText>
                   </InfoItem>
                 );
               })}
             </InfoGrid>
             <Separator />
-            {Object.keys(data.history).map((key) => {
-              let tierCollected = 0;
-              Object.keys(data.history[key].cards).forEach((c) => {
-                tierCollected += data.history[key].cards[c].counter;
-              });
+            {Object.keys(data.history).map((historyKey) => {
               return (
-                <>
-                  <TrackerContainer key={`tracker-${key}`}>
-                    {/* <TrackerText>{tierCollected}</TrackerText> */}
+                <div key={`tracker-${historyKey}`}>
+                  <TrackerContainer>
                     <TierImage
-                      src={data.history[key].image}
-                      alt={data.history[key].title}
+                      src={data.history[historyKey].image}
+                      alt={data.history[historyKey].title}
                     />
                   </TrackerContainer>
                   <FlexGrid>
-                    {pack[key].map((card, index) => {
-                      const collectedCard = data.history[key].cards[card.id];
+                    {pack[historyKey].map((card) => {
+                      const collectedCard =
+                        data.history[historyKey].cards[card.id];
                       return (
                         <FlexItem
-                          key={`tracker-${card.id}`}
+                          key={`tracker-${historyKey}-${card.id}`}
                           collected={collectedCard !== undefined}
                         >
                           {collectedCard !== undefined && (
@@ -356,7 +355,7 @@ const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
                     })}
                   </FlexGrid>
                   <Separator />
-                </>
+                </div>
               );
             })}
           </SidebarWrap>

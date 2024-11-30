@@ -281,6 +281,7 @@ const Packs = ({ packData }) => {
                     {index === 0 && isNew && (
                       <AnimatePresence>
                         <motion.div
+                          key={`new-${stackCounter}-glitter-${card}`}
                           variants={glitterEffectVariants}
                           initial="hidden"
                           animate="visible"
@@ -335,7 +336,7 @@ const Packs = ({ packData }) => {
             {/* Render the new stack of 5 cards */}
             {[0, 1, 2, 3, 4].map((card, index) => (
               <motion.div
-                key={index}
+                key={card}
                 style={{
                   filter,
                   height: 0,

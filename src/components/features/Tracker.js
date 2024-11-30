@@ -6,6 +6,7 @@ import star1Image from "../../images/star1.png";
 import star2Image from "../../images/star2.png";
 import star3Image from "../../images/star3.png";
 import crownImage from "../../images/crown.png";
+import { deleteData, openDatabase } from "./Storage";
 
 export const TrackerData = {
   packsOpened: 0,
@@ -81,9 +82,8 @@ export const TrackerData = {
 };
 
 export function loadTrackerData(trackerData, loadedData) {
-  for (const [key, value] of Object.entries(loadedData)) {
-    const { tier, packType, counter } = value;
-    updateTrackerData(trackerData, { id: key, tier, packType, counter });
+  for (const value of Object.values(loadedData)) {
+    updateTrackerData(trackerData, value);
   }
 }
 
@@ -104,4 +104,17 @@ export function updateTrackerData(trackerData, newData) {
     trackerData.history[tier].cards[id].counter += 1;
   }
   return trackerData;
+}
+
+export function resetTrackerData(dbName, storeName) {
+  const resetDB = async () => {
+    try {
+      const db = await openDatabase(dbName, storeName);
+      await deleteData(db, storeName);
+    } catch (error) {
+      console.error("Error initializing IndexedDB:", error);
+    }
+  };
+
+  resetDB();
 }

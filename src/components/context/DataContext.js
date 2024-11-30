@@ -1,10 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   loadTrackerData,
+  resetTrackerData,
   TrackerData,
   updateTrackerData,
 } from "components/features/Tracker";
-import { getData, openDatabase, storeData } from "components/features/Storage";
+import {
+  getTrackerData,
+  openDatabase,
+  storeData,
+} from "components/features/Storage";
 
 const DataContext = createContext();
 
@@ -43,8 +48,10 @@ export const DataProvider = ({ children }) => {
     const initializeDB = async () => {
       try {
         db = await openDatabase(DatabaseName, DatabaseStorage);
-        const allData = await getData(db, DatabaseStorage);
-        loadTrackerData(allData);
+        const allData = await getTrackerData(db, DatabaseStorage);
+        if (allData.length > 0) {
+          loadTrackerData(data, allData);
+        }
       } catch (error) {
         console.error("Error initializing IndexedDB:", error);
       }
@@ -52,7 +59,6 @@ export const DataProvider = ({ children }) => {
 
     initializeDB();
 
-    // Cleanup (optional, if you need to close or handle IndexedDB differently)
     return () => {
       if (db) {
         db.close();
@@ -62,13 +68,20 @@ export const DataProvider = ({ children }) => {
 
   const setData = (newData) => {
     const newTrackerData = updateTrackerData(data, newData);
-    let { id, tier, packType, counter } = newData;
-    scheduleBatchWrite(id, { tier, packType, counter });
+    if (!Number.isInteger(newData)) {
+      let { id, tier, packType, counter } = newData;
+      scheduleBatchWrite(id, { tier, packType, counter });
+    }
     setDataState({ ...newTrackerData });
   };
 
+  const resetData = () => {
+    resetTrackerData(DatabaseName, DatabaseStorage);
+    setDataState(TrackerData);
+  };
+
   return (
-    <DataContext.Provider value={{ data, setData }}>
+    <DataContext.Provider value={{ data, setData, resetData }}>
       {children}
     </DataContext.Provider>
   );
