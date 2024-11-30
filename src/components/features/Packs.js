@@ -67,7 +67,7 @@ const preloadImage = (src) => {
 };
 
 const Packs = ({ packData }) => {
-  const { data, setData } = useData();
+  const { data, setData, incrementStackCounter } = useData();
 
   // State to manage the stack and card animations
   const [cards, setCards] = useState([0, 1, 2, 3, 4]); // Initialize with 5 cards
@@ -105,7 +105,7 @@ const Packs = ({ packData }) => {
     setCards([0, 1, 2, 3, 4]); // Reset the stack
     setImageLoaded(false); // Reset image loaded state for new stack
 
-    fetchNewStack(); // Fetch new images for the next stack
+    fetchNewStack(false); // Fetch new images for the next stack
 
     setTimeout(() => {
       setNewStackVisible(false); // Hide the new stack after animation
@@ -120,9 +120,11 @@ const Packs = ({ packData }) => {
   };
 
   // Function to fetch new images dynamically for the next stack
-  const fetchNewStack = async () => {
+  const fetchNewStack = async (toIncrementStack) => {
     setStackCounter((prevCount) => prevCount + 1);
-    setData(stackCounter);
+    if (toIncrementStack) {
+      incrementStackCounter();
+    }
     const newImages = await fetchNewImages(packData); // Fetch new images for the stack
     setImageSet(newImages); // Update image set
     setImageLoaded(false); // Reset loading state
@@ -148,7 +150,7 @@ const Packs = ({ packData }) => {
       setCards([0, 1, 2, 3, 4]); // Reset the stack
       setImageLoaded(false); // Reset image loaded state for new stack
 
-      fetchNewStack(); // Fetch new images for the next stack
+      fetchNewStack(true); // Fetch new images for the next stack
 
       setNewStackVisible(true);
 
@@ -230,7 +232,7 @@ const Packs = ({ packData }) => {
         display: "flex",
         placeContent: "center",
         paddingTop: "3rem",
-        overflow: "hidden", // Prevent scrollbars
+        overflow: "hidden",
       }}
     >
       <motion.div
@@ -298,7 +300,7 @@ const Packs = ({ packData }) => {
                           exit={{ scale: 0, transition: { duration: 0.2 } }}
                           transition={{
                             type: "spring",
-                            stiffness: 500,
+                            stiffness: 800,
                             damping: 50,
                             duration: 0.1,
                           }}
@@ -333,7 +335,6 @@ const Packs = ({ packData }) => {
               borderRadius: 10,
             }}
           >
-            {/* Render the new stack of 5 cards */}
             {[0, 1, 2, 3, 4].map((card, index) => (
               <motion.div
                 key={card}
@@ -343,9 +344,9 @@ const Packs = ({ packData }) => {
                   width: "100%",
                   paddingTop: "139.509%",
                   position: "absolute",
-                  top: `${(cards.length - index - 1) * 10}px`, // Slight offset for each card
+                  top: `${(cards.length - index - 1) * 10}px`,
                   left: `${(index / cards.length) * 30}px`,
-                  zIndex: cards.length - index, // Ensure the top card is always on top
+                  zIndex: cards.length - index,
                   cursor: "pointer",
                   backgroundImage: `url(${imageSet[index].image})`,
                   backgroundSize: "cover",

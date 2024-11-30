@@ -93,15 +93,15 @@ export function loadMiscellaneousData(trackerData, loadedData) {
 
 export function updateTrackerData(trackerData, newData) {
   if (Number.isInteger(newData)) {
-    trackerData.packsOpened = newData + 1;
+    trackerData.packsOpened = newData;
     return trackerData;
   }
 
   const { id, tier, packType, counter = 1 } = newData;
 
   if (!trackerData.history[tier].cards[id]) {
-    trackerData.uniqueTracker.total.collected += counter;
-    trackerData.uniqueTracker[packType].collected += counter;
+    trackerData.uniqueTracker.total.collected += 1;
+    trackerData.uniqueTracker[packType].collected += 1;
     newData.counter = counter;
     trackerData.history[tier].cards[id] = newData;
   } else {

@@ -25,9 +25,11 @@ let pendingData = {
   [DatabaseMiscellaneous]: {},
 };
 
+const debounceMap = new Map();
+
 const scheduleBatchWrite = (key, value, storeName) => {
   pendingData[storeName][key] = value;
-  debouncedWriteBatch(storeName);
+  debouncedWriteBatch(storeName)();
 };
 
 const debounce = (func, delay) => {
@@ -38,16 +40,31 @@ const debounce = (func, delay) => {
   };
 };
 
-const debouncedWriteBatch = debounce(async (storeName) => {
-  if (Object.keys(pendingData[storeName]).length === 0) return;
+const debouncedWriteBatch = (storeName) => {
+  if (!debounceMap.has(storeName)) {
+    debounceMap.set(
+      storeName,
+      debounce(async () => {
+        if (
+          !pendingData[storeName] ||
+          Object.keys(pendingData[storeName]).length === 0
+        )
+          return;
 
-  const db = await openDatabase(DatabaseName, storeName);
-  await storeData(db, storeName, pendingData[storeName]);
-  pendingData[storeName] = {};
-}, 500);
+        const db = await openDatabase(DatabaseName, storeName);
+        await storeData(db, storeName, { ...pendingData[storeName] });
+        pendingData[storeName] = {};
+      }, 500)
+    );
+  }
+
+  return debounceMap.get(storeName);
+};
 
 export const DataProvider = ({ children }) => {
-  const [data, setDataState] = useState({ ...TrackerData });
+  const [data, setDataState] = useState(
+    JSON.parse(JSON.stringify(TrackerData))
+  );
 
   useEffect(() => {
     let db;
@@ -86,18 +103,20 @@ export const DataProvider = ({ children }) => {
     };
   }, []);
 
+  const incrementStackCounter = () => {
+    const newTrackerData = updateTrackerData(data, data.packsOpened + 1);
+    scheduleBatchWrite(
+      "packsOpened",
+      newTrackerData.packsOpened,
+      DatabaseMiscellaneous
+    );
+    setDataState({ ...newTrackerData });
+  };
+
   const setData = (newData) => {
     const newTrackerData = updateTrackerData(data, newData);
-    if (Number.isInteger(newData)) {
-      scheduleBatchWrite(
-        "packsOpened",
-        newTrackerData.packsOpened,
-        DatabaseMiscellaneous
-      );
-    } else {
-      let { id, tier, packType, counter } = newData;
-      scheduleBatchWrite(id, { tier, packType, counter }, DatabaseStorage);
-    }
+    let { id, tier, packType, counter } = newData;
+    scheduleBatchWrite(id, { tier, packType, counter }, DatabaseStorage);
     setDataState({ ...newTrackerData });
   };
 
@@ -105,11 +124,13 @@ export const DataProvider = ({ children }) => {
     resetTrackerData(DatabaseName, DatabaseStorage);
     resetTrackerData(DatabaseName, DatabaseMiscellaneous);
     closeAndDeleteDatabase(DatabaseName);
-    setDataState({ ...TrackerData });
+    setDataState(JSON.parse(JSON.stringify(TrackerData)));
   };
 
   return (
-    <DataContext.Provider value={{ data, setData, resetData }}>
+    <DataContext.Provider
+      value={{ data, setData, resetData, incrementStackCounter }}
+    >
       {children}
     </DataContext.Provider>
   );
