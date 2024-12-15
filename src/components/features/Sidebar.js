@@ -7,6 +7,7 @@ import ApexMewtwoLogo from "../../images/genetic-apex-mewtwo-logo.png";
 import ApexPikachuLogo from "../../images/genetic-apex-pikachu-logo.png";
 import { useData } from "../context/DataContext";
 import { getPackType } from "./Calculator";
+import { getImage } from "components/resources/Prizes";
 
 const Nav = styled.div`
   display: flex;
@@ -135,20 +136,20 @@ export const InfoGrid = styled.div`
 `;
 
 export const FlexItem = styled.div`
-  width: 95px;
+  width: 70px;
   box-sizing: border-box;
   margin: 6px;
-  min-height: 63px;
-  border-radius: 10px;
+  min-height: 97px;
+  border-radius: 3px;
   text-align: center;
-  color: ${(props) => (props.collected ? "auto" : "gray")};
-  border: ${(props) =>
-    props.collected ? "4px solid green" : "2px solid gray"};
+  color: ${({ collected }) => (collected ? "auto" : "gray")};
+  border: ${({ collected }) => (collected ? "4px solid green" : "2px solid gray")};
   display: flex;
-  justify-content: center;
   align-items: center;
   flex-direction: column;
   font-size: 0.9rem;
+  justify-content: end;
+  padding-bottom: 5px;
 `;
 
 export const InfoItem = styled.div`
@@ -211,8 +212,20 @@ const ResetButton = styled.button`
 
   font-weight: bold;
   margin-top: auto;
-  text-align: center;
+  text-align: center; 
 `;
+
+const CardCounter = styled.div`
+    min-height: 30px;
+    min-width: 30px;
+    border-radius: 10px;
+    color: ${({collected}) => (collected ? "white" : "black")};
+    background-color: ${({collected}) => (collected ? "black" : "none")};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+`
 
 const DataText = tw.div`text-2xl font-bold`;
 const InfoText = tw.div`text-xs`;
@@ -339,17 +352,22 @@ const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
                     {pack[historyKey].map((card) => {
                       const collectedCard =
                         data.history[historyKey].cards[card.id];
+                      const collected = collectedCard !== undefined
                       return (
                         <FlexItem
                           key={`tracker-${historyKey}-${card.id}`}
-                          collected={collectedCard !== undefined}
+                          collected={collectedCard}
+                          style={{ 
+                            backgroundImage: `url(${collected ? getImage(card.id, true) : ''})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            backgroundRepeat: "no-repeat",
+                            borderRadius: 10
+                          }}
                         >
-                          {collectedCard !== undefined && (
-                            <p>
-                              <strong>x{collectedCard.counter}</strong>
-                            </p>
-                          )}
-                          <p>{card.name}</p>
+                            <CardCounter collected={collected}>
+                              {collected ? `x${collectedCard.counter}` : "?"}
+                            </CardCounter>
                         </FlexItem>
                       );
                     })}
