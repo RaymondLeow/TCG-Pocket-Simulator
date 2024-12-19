@@ -31,6 +31,11 @@ export const TrackerData = {
       maxUnique: 80,
       collected: 0,
     },
+    mew: {
+      title: "Mythical Island",
+      maxUnique: 86,
+      collected: 0,
+    },
     all: {
       title: "Genetic Apex (All)",
       maxUnique: 46,

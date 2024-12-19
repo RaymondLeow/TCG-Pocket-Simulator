@@ -1,7 +1,11 @@
 import MainPage from "./components/section/MainPage";
 import React from "react";
-import tw from "twin.macro";
-const Section = tw.div`lg:overflow-hidden`;
+import styled from "styled-components"
+
+// const Section = tw.div`lg:overflow-hidden`;
+const Section = styled.div`
+  overflow: hidden;
+`
 
 const StartPage = ({ packData }) => {
   return (

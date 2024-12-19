@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import tw from "twin.macro";
 import GlobalStyles from "styles/GlobalStyles";
 import styled from "styled-components";
-import Sidebar from "components/features/Sidebar.js";
+import Sidebar from "components/features/sidebar/Sidebar.js";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import StartPage from "./StartPage.js";
 import BackgroundImage from "./images/container_bg.png";
@@ -15,11 +14,17 @@ const Container = styled.div`
   height: 100vh;  
 `;
 
-const Background = tw.div`
-  absolute inset-0 bg-contain bg-center transform z-0 overflow-hidden
-`;
+const Background = styled.div`
+  position: absolute;
+  background-size: contain;
+  background-position: center;
+  overflow: hidden;
+  inset: 0;
+  z-index: 0;
+`
 
 const defaultWidth = 360;
+
 const App = () => {
   const [packData, setPackData] = useState("mewtwo");
   const [sidebarWidth, setSidebarWidth] = useState(defaultWidth);

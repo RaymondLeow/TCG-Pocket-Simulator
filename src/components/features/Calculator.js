@@ -4,6 +4,7 @@ import {
   mewtwoPack,
   pikachuPack,
   charizardPack,
+  mewPack,
   allPack,
   getImage,
 } from "components/resources/Prizes";
@@ -46,8 +47,19 @@ export function getPackType(packData) {
       return pikachuPack;
     case "charizard":
       return charizardPack;
+    case "mew":
+      return mewPack;
     default:
       return allPack;
+  }
+}
+
+export function getPackTypeData(packData) {
+  switch (packData) {
+    case "mew":
+      return {prefix: "mythical-island", date: "2024/12"}
+    default:
+      return {prefix: "tcg", date: "2024/11"}
   }
 }
 
@@ -58,35 +70,37 @@ export function gamble(packData) {
   let position = 0;
 
   const pack = getPackType(packData);
+  const packTypeData = getPackTypeData(packData)
+  const commonPack = packTypeData.prefix === "tcg" ? allPack : []
 
   // First three rolls always tier1
   for (let i = 0; i < 3; i++) {
-    prizes = pack.diamond1.concat(allPack.diamond1);
+    prizes = pack.diamond1.concat(commonPack.diamond1);
     position = Math.floor(Math.random() * prizes.length);
     const prize = prizes[position];
     prize.tier = "diamond1";
-    prize.image = getImage(prize.id);
+    prize.image = getImage(prize.id, packTypeData);
     prize.packType = position >= pack.diamond1.length ? "all" : packData;
     result.push(prize);
   }
 
   // Fourth roll (use tierProbabilitiesFourth)
   const fourthTier = getTier(tierProbabilitiesFourth);
-  prizes = pack[fourthTier].concat(allPack[fourthTier]);
+  prizes = pack[fourthTier].concat(commonPack[fourthTier]);
   position = Math.floor(Math.random() * prizes.length);
   const fourthPrize = prizes[position];
   fourthPrize.tier = fourthTier;
-  fourthPrize.image = getImage(fourthPrize.id);
+  fourthPrize.image = getImage(fourthPrize.id, packTypeData);
   fourthPrize.packType = position >= pack[fourthTier].length ? "all" : packData;
   result.push(fourthPrize);
 
   // Fifth roll (use tierProbabilitiesFifth)
   const fifthTier = getTier(tierProbabilitiesFifth);
-  prizes = pack[fifthTier].concat(allPack[fifthTier]);
+  prizes = pack[fifthTier].concat(commonPack[fifthTier]);
   position = Math.floor(Math.random() * prizes.length);
   const fifthPrize = prizes[position];
   fifthPrize.tier = fifthTier;
-  fifthPrize.image = getImage(fifthPrize.id);
+  fifthPrize.image = getImage(fifthPrize.id, packTypeData);
   fifthPrize.packType = position >= pack[fifthTier].length ? "all" : packData;
   result.push(fifthPrize);
 

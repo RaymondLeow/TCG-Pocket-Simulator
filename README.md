@@ -6,5 +6,5 @@ Simple simulator for pulling packs with the actual probabilities
 
 - [React](https://react.dev/)
 - [Framer](https://framer.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
+- [styled-components](https://styled-components.com)
 - [Github Pages](https://pages.github.com/)

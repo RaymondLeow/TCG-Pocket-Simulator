@@ -255,9 +255,11 @@ const Packs = ({ packData }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ 
+        // opacity: 0, 
+        y: 10 }}
       animate={{
-        opacity: imageLoaded ? 1 : 0,
+        // opacity: imageLoaded ? 1 : 0,
         y: imageLoaded ? 0 : 10,
       }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
