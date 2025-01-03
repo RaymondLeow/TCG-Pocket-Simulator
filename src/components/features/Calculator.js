@@ -75,9 +75,10 @@ export function gamble(packData) {
 
   // First three rolls always tier1
   for (let i = 0; i < 3; i++) {
-    prizes = pack.diamond1.concat(commonPack.diamond1);
+    prizes = pack.diamond1.concat(commonPack.diamond1 ? commonPack.diamond1 : []);
     position = Math.floor(Math.random() * prizes.length);
     const prize = prizes[position];
+    console.log(pack, prizes, prize, position, prizes.length)
     prize.tier = "diamond1";
     prize.image = getImage(prize.id, packTypeData);
     prize.packType = position >= pack.diamond1.length ? "all" : packData;
@@ -86,9 +87,10 @@ export function gamble(packData) {
 
   // Fourth roll (use tierProbabilitiesFourth)
   const fourthTier = getTier(tierProbabilitiesFourth);
-  prizes = pack[fourthTier].concat(commonPack[fourthTier]);
+  prizes = pack[fourthTier].concat(Object.keys(commonPack).length > 0 ? commonPack[fourthTier] : []);
   position = Math.floor(Math.random() * prizes.length);
   const fourthPrize = prizes[position];
+  console.log(pack, prizes, fourthPrize, position)
   fourthPrize.tier = fourthTier;
   fourthPrize.image = getImage(fourthPrize.id, packTypeData);
   fourthPrize.packType = position >= pack[fourthTier].length ? "all" : packData;
@@ -96,9 +98,10 @@ export function gamble(packData) {
 
   // Fifth roll (use tierProbabilitiesFifth)
   const fifthTier = getTier(tierProbabilitiesFifth);
-  prizes = pack[fifthTier].concat(commonPack[fifthTier]);
+  prizes = pack[fifthTier].concat(Object.keys(commonPack).length > 0 ? commonPack[fifthTier] : []);
   position = Math.floor(Math.random() * prizes.length);
   const fifthPrize = prizes[position];
+  console.log(pack, prizes, fifthPrize, position)
   fifthPrize.tier = fifthTier;
   fifthPrize.image = getImage(fifthPrize.id, packTypeData);
   fifthPrize.packType = position >= pack[fifthTier].length ? "all" : packData;
