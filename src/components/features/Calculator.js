@@ -54,6 +54,10 @@ export function getPackType(packData) {
   }
 }
 
+export function getAllPackType(packData) {
+  return packData === 'mew' ? {} : allPack
+}
+
 export function getPackTypeData(packData) {
   switch (packData) {
     case "mew":

@@ -6,7 +6,7 @@ import ApexMewtwoLogo from "../../../images/genetic-apex-mewtwo-logo.png";
 import ApexPikachuLogo from "../../../images/genetic-apex-pikachu-logo.png";
 import MythicalIslandLogo from "../../../images/mythical-island-logo.png"
 import { useData } from "../../context/DataContext";
-import { getPackType, getPackTypeData } from "../Calculator";
+import { getAllPackType, getPackType, getPackTypeData } from "../Calculator";
 import { getImage } from "components/resources/Prizes";
 import { ImageButtonImage, CenterContainer, SidebarNav, ResetButton, ResizableContainer, SidebarWrap, SidebarButtonContainer, SidebarClose, InfoGrid, InfoItem, TrackerContainer, TierImage, FlexGrid, FlexItem, CardCounter, Separator, Nav, Resizer} from "./SidebarDiv";
 
@@ -35,6 +35,12 @@ const ImageButton = ({ imageSrc, packData, alt, onButtonClick, selected }) => {
 };
 
 const concatPack = (pack1, pack2) => {
+  if (Object.keys(pack1).length === 0) {
+    return pack2
+  }
+  if (Object.keys(pack2).length === 0) {
+    return pack1
+  }
   let result = {};
   Object.keys(pack1).forEach((tier) => {
     result[tier] = pack1[tier].concat(pack2[tier]);
@@ -60,7 +66,7 @@ const Sidebar = ({ onButtonClick, sidebarWidth, onMouseDown }) => {
   const handleButtonClick = (packData) => {
     onButtonClick(packData);
     setPackData(packData);
-    setPack(concatPack(getPackType(packData), getPackType("all")));
+    setPack(concatPack(getPackType(packData), getAllPackType(packData)));
   };
 
   return (
